@@ -1,0 +1,73 @@
+<div class="gridHead">SAC Group</div>
+<div class="gridContent">
+	{{item.SACGroup}}
+</div>
+
+<div class="gridHead">SAC</div>
+<div class="gridContent">
+	{{item.SAC}}
+</div>
+
+<div class="gridHead">Difficulty</div>
+<div class="gridContent">
+	{{item.difficulty}}
+</div>
+
+	
+	<div class="gridHead">Quantity</div>
+	<div class="gridContent">
+		{{item.quantity}}
+	</div>
+
+	<div class="gridHead">Line Type</div>
+	<div class="gridContent">
+		{{item.lineType}}
+	</div>
+
+	<div class="gridHead" data-tooltip="How many times will this configuration be re-used">Multiplier <i class="fa fa-question-circle"></i></div>
+	<div class="gridContent">
+		{{item.multiplier}}
+	</div>
+
+	<div class="gridHead">2nd Multiplier</div>
+	<div class="gridContent">
+		{{item.secondmultiplier}}
+	</div>
+</div>
+<div class="small-1 columns">
+	<div class="gridHead">Size</div>
+	<div class="gridContent">
+		{{item.size}}
+	</div>
+</div>
+<div class="small-1 columns">
+	<div class="gridHead">Length</div>
+	<div class="gridContent noWrap">
+		{{item.length}} ft &nbsp;&nbsp;
+		{{item.lengthinches}} in
+	</div>
+</div>
+<div class="small-1 columns">
+	<div class="gridHead">Grade</div>
+	<div class="gridContent">
+		{{item.grade}}
+	</div>
+</div>
+<div class="small-1 columns">
+	<div class="gridHead">Notes</div>
+	<div class="gridContent">
+		{{item.notes}}
+	</div>
+</div>
+<div class="small-1 columns">
+	<div class="gridHead">Weight (lbs)</div>
+	<div class="gridContent">
+		<b>{{itemWeight(item) | number}} lbs</b>
+	</div>
+</div>
+<div class="small-1 columns">
+	<div class="gridHead">Cost</div>
+	<div class="gridContent">
+		{{itemCost(item, estimate) | currency}}
+	</div>
+</div>

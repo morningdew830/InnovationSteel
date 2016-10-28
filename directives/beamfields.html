@@ -1,0 +1,749 @@
+<form>
+
+<b>BEAM TOOL</b>
+<div class="editGrid smallFlexibleTable"  ng-init="setJobDefaults(estimate)">
+
+	<div class="gridItem">
+		<!-- Persistant Default -->
+		<span ng-init="beam.groupID=user.groupID"></span>
+		<span ng-if="!beam.groupID">
+			<span ng-init="$parent.beam.groupID='new group'"></span>
+		</span>
+
+		<div class="gridHead">Group / Area</div>
+		<div class="gridContent">
+			<select ng-model="beam.groupID">
+				<option value="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'">{{group.title}}</option>
+				<option value="new group" ng-show="!beam.$id">-- New --</option>
+			</select>
+			<input type="text" ng-model="group.title" placeholder="Group Name" ng-if="beam.groupID == 'new group'">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Difficulty</div>
+		<div class="gridContent">
+			<select ng-model="beam.difficulty" ng-init="beam.difficulty = '1'">
+				<option ng-repeat="difficulty in difficultyLevels" value="{{difficulty.level}}">{{difficulty.level}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- PERSISTANT DEFAULT -->
+		<span ng-init="beam.SACGroup=user.SACGroup"></span>
+		<span ng-if="!user.SACGroup">
+			<span ng-init="$parent.beam.SACGroup=SACGroups[0].name"></span>
+		</span>
+
+		<div class="gridHead">SAC Group</div>
+		<div class="gridContent">
+			<select ng-model="beam.SACGroup" ng-change="items.$save(item); setSACGroup(beam.SACGroup)">
+				<option ng-repeat="group in SACGroups" value="{{group.name}}">{{group.name}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- PERSISTANT DEFAULT -->
+		<span ng-init="beam.SAC=user.SAC"></span>
+		<span ng-if="!user.SAC" ng-repeat="code in SACCodes | filter:{group: beam.SACGroup}">
+			<span ng-if="$index==0" ng-init="$parent.beam.SAC=code.code"></span>
+		</span>
+
+		<div class="gridHead">SAC</div>
+		<div class="gridContent">
+			<select ng-model="beam.SAC" ng-change="items.$save(item); setItemSAC(beam.SAC)">
+				<option ng-repeat="code in SACCodes | filter:{group: beam.SACGroup}" value="{{code.code}}">{{code.code}} - {{code.description}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Tie Clearance</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.tieLength"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.tieLengthInches"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead" data-tooltip="How many times will this configuration be re-used">Multiplier <i class="fa fa-question-circle"></i></div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="beam.multiplier=1" ng-model="beam.multiplier">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead" data-tooltip="How many times will this configuration be re-used">Multiplier 2<i class="fa fa-question-circle"></i></div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="beam.multiplier2=1" ng-model="beam.multiplier2">
+		</div>
+	</div>
+
+</div>
+
+<div class="smallFlexibileTable editGrid">
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Height</div>
+		<input type="text" id="startPointBeam" placeholder="0" class="weightInput" ng-model="beam.lengthFt"> ft &nbsp;&nbsp;
+		<input type="text" placeholder="0" class="weightInput" ng-model="beam.lengthIn"> in
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Width</div>
+		<input type="text" placeholder="0" class="weightInput" ng-model="beam.width"> ft &nbsp;&nbsp;
+		<input type="text" placeholder="0" class="weightInput" ng-model="beam.widthinches"> in
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Span</div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.span" ng-change="items.$save(item); setLaps(estimate);" > ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.spaninches" ng-init="beam.spaninches = 0" ng-change="items.$save(item)"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Grade</div>
+		<div class="gridContent">
+			<select ng-model="beam.grade">
+				<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+					{{grade.label}}
+				</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Bend</div>
+		<div class="gridContent">
+			<select ng-model="beam.lineType" ng-init="beam.lineType='Straight'">
+				<option value="Straight">Straight</option>
+				<option value="Light Bend">Light Bend</option>
+				<option value="Heavy Bend">Heavy Bend</option>
+				<option value="Special Bend">Special Bend</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem" ng-show="beam.vertType.indexOf('Lap Length') > -1">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Stock Length</div>
+		<input type="text" placeholder="0" class="weightInput" ng-model="beam.stocklength"> ft &nbsp;&nbsp;
+		<input type="text" placeholder="0" class="weightInput" ng-model="beam.stocklengthinches"> in
+	</div>
+
+	<div class="gridItem" ng-show="beam.vertType.indexOf('Lap Length') > -1">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Lap <small>(diameter)</small></div>
+		<div class="gridContent noWrap">
+			<input type="text" class="weightInput" placeholder="0" ng-model="beam.diameter"  ng-change="calculateLapLength(column);">
+		</div>
+	</div>
+
+	<div class="gridItem" ng-show="beam.vertType.indexOf('Lap Length') > -1">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Lap <small>(length)</small></div>
+		<div class="gridContent noWrap">
+			<input type="text" class="weightInput" placeholder="0" ng-model="beam.laplength"  ng-change="calculateLapDiameter(column);"> in
+		</div>
+	</div>
+
+</div>
+
+<div class="highlight">
+<b>TOP BARS</b>
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Size</div>
+		<div class="gridContent">
+			<select ng-model="beam.topBar.size" ng-change="calculateLapLength(beam.topBar); calculateLapDiameter(beam.topBar);  setLaps(estimate);">
+				<option ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]" value="{{i}}">
+					{{i}}
+				</option>
+			</select>
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Quantity</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="quantityText" ng-model="beam.topBar.quantity">
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Stock</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.topBar.stocklength"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.topBar.stocklengthinches"> in
+		</div>
+	</div>
+
+	<!-- STOCK > SPAN CORRECTOR -->
+	<span ng-if="(beam.topBar.totalSpan <= convertToInches(beam.topBar.stocklength, beam.topBar.stocklengthinches))" 
+			ng-init="beam.topBar.diameterOver=null; beam.topBar.diameterOverInches=null; beam.topBar.diameter=null; beam.topBar.laplength=null;"></span>
+
+	<div class="gridItem"  ng-if="!(beam.topBar.totalSpan <= convertToInches(beam.topBar.stocklength, beam.topBar.stocklengthinches))">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Diameter Over</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.topBar.diameterOver"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.topBar.diameterOverInches"> in
+		</div>
+	</div>
+	<div class="gridItem" ng-if="!(beam.topBar.totalSpan <= convertToInches(beam.topBar.stocklength, beam.topBar.stocklengthinches))">
+		<div class="gridHead">Lap Diameter</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="beam.topBar.diameter" ng-change="calculateLapLength(beam.topBar)">
+		</div>
+	</div>
+	<div class="gridItem" ng-if="!(beam.topBar.totalSpan <= convertToInches(beam.topBar.stocklength, beam.topBar.stocklengthinches))">
+		<div class="gridHead">Lap Length</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="beam.topBar.laplength"  ng-change="calculateLapDiameter(beam.topBar)"> in
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Hook 1</div>
+		<div class="gridContent">
+			<select ng-model="beam.topBar.hook1" ng-init="beam.topBar.hook1='none:0'" ng-change="setHook(beam.topBar.hook1, beam.topBar, 'end1')" class="smallSelect">
+				<option value="none:0">None</option>
+				<option ng-repeat="dimension in endDimensions | filter:{size:beam.topBar.size || 'all'}:true" value="{{dimension.value}}">{{dimension.label}}</option>
+			</select>
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.topBar.end1FT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.topBar.end1IN"> in
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Hook 2</div>
+		<div class="gridContent">
+			<select ng-model="beam.topBar.hook2" ng-init="beam.topBar.hook2='none:0'" ng-change="setHook(beam.topBar.hook2, beam.topBar, 'end2')" class="smallSelect">
+				<option value="none:0">None</option>
+				<option ng-repeat="dimension in endDimensions | filter:{size:beam.topBar.size || 'all'}:true" value="{{dimension.value}}">{{dimension.label}}</option>
+			</select>
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.topBar.end2FT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.topBar.end2IN"> in
+		</div>
+	</div>
+</div>
+</div>
+
+<div class="highlight">
+<b>MID BARS</b>
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<div class="gridHead">Size</div>
+		<div class="gridContent">
+			<select ng-model="beam.midBar.size"  ng-change="calculateLapLength(beam.midBar); calculateLapDiameter(beam.midBar);  setLaps(estimate);">
+				<option ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]" value="{{i}}">
+					{{i}}
+				</option>
+			</select>
+		</div>
+	</div>
+	<div class="gridItem">
+		<div class="gridHead">Quantity</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="quantityText" ng-model="beam.midBar.quantity">
+		</div>
+	</div>
+	<div class="gridItem">
+		<div class="gridHead">Stock</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.midBar.stocklength"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.midBar.stocklengthinches"> in
+		</div>
+	</div>
+
+	<!-- STOCK > SPAN CORRECTOR -->
+	<span ng-if="(totalSpan <= convertToInches(beam.midBar.stocklength, beam.midBar.stocklengthinches))" 
+			ng-init="beam.midBar.diameterOver=null; beam.midBar.diameterOverInches=null; beam.midBar.diameter=null; beam.midBar.laplength=null;"></span>
+
+	<div class="gridItem" ng-if="!(beam.midBar.totalSpan <= convertToInches(beam.midBar.stocklength, beam.midBar.stocklengthinches))">
+		<div class="gridHead">Diameter Over</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.midBar.diameterOver"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.midBar.diameterOverInches"> in
+		</div>
+	</div>
+	<div class="gridItem" ng-if="!(beam.midBar.totalSpan <= convertToInches(beam.midBar.stocklength, beam.midBar.stocklengthinches))">
+		<div class="gridHead">Lap Diameter</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="beam.midBar.diameter" ng-change="calculateLapLength(beam.midBar)">
+		</div>
+	</div>
+	<div class="gridItem" ng-if="!(beam.midBar.totalSpan <= convertToInches(beam.midBar.stocklength, beam.midBar.stocklengthinches))">
+		<div class="gridHead">Lap Length</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="beam.midBar.laplength"  ng-change="calculateLapDiameter(beam.midBar)"> in
+		</div>
+	</div>
+	<div class="gridItem">
+		<div class="gridHead">Hook 1</div>
+		<div class="gridContent">
+			<select ng-model="beam.midBar.hook1" ng-init="beam.midBar.hook1='none:0'" ng-change="setHook(beam.midBar.hook1, beam.midBar, 'end1')" class="smallSelect">
+				<option value="none:0">None</option>
+				<option ng-repeat="dimension in endDimensions | filter:{size:beam.midBar.size || 'all'}:true" value="{{dimension.value}}">{{dimension.label}}</option>
+			</select>
+
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.midBar.end1FT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.midBar.end1IN"> in
+		</div>
+	</div>
+	<div class="gridItem">
+		<div class="gridHead">Hook 2</div>
+		<div class="gridContent">
+			<select ng-model="beam.midBar.hook2" ng-init="beam.midBar.hook2='none:0'" ng-change="setHook(beam.midBar.hook2, beam.midBar, 'end2')" class="smallSelect">
+				<option value="none:0">None</option>
+				<option ng-repeat="dimension in endDimensions | filter:{size:beam.midBar.size || 'all'}:true" value="{{dimension.value}}">{{dimension.label}}</option>
+			</select>
+
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.midBar.end2FT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.midBar.end2IN"> in
+		</div>
+	</div>
+</div>
+</div>
+
+<div class="highlight">
+<b>BOTTOM BARS</b>
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<div class="gridHead">Size</div>
+		<div class="gridContent">
+			<select ng-model="beam.bottomBar.size"  ng-change="calculateLapLength(beam.bottomBar); calculateLapDiameter(beam.bottomBar);  setLaps(estimate);">
+				<option ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]" value="{{i}}">
+					{{i}}
+				</option>
+			</select>
+		</div>
+	</div>
+	<div class="gridItem">
+		<div class="gridHead">Quantity</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="quantityText" ng-model="beam.bottomBar.quantity">
+		</div>
+	</div>
+	<div class="gridItem">
+		<div class="gridHead">Stock</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.bottomBar.stocklength"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.bottomBar.stocklengthinches"> in
+		</div>
+	</div>
+
+	<!-- STOCK > SPAN CORRECTOR -->
+	<span ng-if="(beam.bottomBar.totalSpan <= convertToInches(beam.bottomBar.stocklength, beam.bottomBar.stocklengthinches))" 
+			ng-init="beam.bottomBar.diameterOver=null; beam.bottomBar.diameterOverInches=null; beam.bottomBar.diameter=null; beam.bottomBar.laplength=null;"></span>
+
+	<div class="gridItem" ng-if="!(beam.bottomBar.totalSpan <= convertToInches(beam.bottomBar.stocklength, beam.bottomBar.stocklengthinches))">
+		<div class="gridHead">Diameter Over</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.bottomBar.diameterOver"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.bottomBar.diameterOverInches"> in
+		</div>
+	</div>
+	<div class="gridItem" ng-if="!(beam.bottomBar.totalSpan <= convertToInches(beam.bottomBar.stocklength, beam.bottomBar.stocklengthinches))">
+		<div class="gridHead">Lap Diameter</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="beam.bottomBar.diameter" ng-change="calculateLapLength(beam.bottomBar)">
+		</div>
+	</div>
+	<div class="gridItem" ng-if="!(beam.bottomBar.totalSpan <= convertToInches(beam.bottomBar.stocklength, beam.bottomBar.stocklengthinches))">
+		<div class="gridHead">Lap Length</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="beam.bottomBar.laplength"  ng-change="calculateLapDiameter(beam.bottomBar)"> in
+		</div>
+	</div>
+	<div class="gridItem">
+		<div class="gridHead">Hook 1</div>
+		<div class="gridContent">
+			<select ng-model="beam.bottomBar.hook1" ng-init="beam.bottomBar.hook1='none:0'" ng-change="setHook(beam.bottomBar.hook1, beam.bottomBar, 'end1')"  class="smallSelect">
+				<option value="none:0">None</option>
+				<option ng-repeat="dimension in endDimensions | filter:{size:beam.bottomBar.size || 'all'}:true" value="{{dimension.value}}">{{dimension.label}}</option>
+			</select>
+
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.bottomBar.end1FT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.bottomBar.end1IN"> in
+		</div>
+	</div>
+	<div class="gridItem">
+		<div class="gridHead">Hook 2</div>
+		<div class="gridContent">
+			<select ng-model="beam.bottomBar.hook2" ng-init="beam.bottomBar.hook2='none:0'" ng-change="setHook(beam.bottomBar.hook2, beam.bottomBar, 'end2')"  class="smallSelect">
+				<option value="none:0">None</option>
+				<option ng-repeat="dimension in endDimensions | filter:{size:beam.bottomBar.size || 'all'}:true" value="{{dimension.value}}">{{dimension.label}}</option>
+			</select>
+
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.bottomBar.end2FT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="beam.bottomBar.end2IN"> in
+		</div>
+	</div>
+</div>
+</div>
+
+<!-- START CUSTOM TOOL -->
+<div class="editGrid smallFlexibleTable" ng-show="beam.type!='Circular'">
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Shape</div>
+		<div class="gridContent">
+			<select ng-model="beam.shape" ng-init="beam.shape='Custom'" ng-change="setBeamShapeFields();handleBeamCustom();">
+				<option value="Custom">Custom</option>
+				<option value="Exterior With Crossing T9s">Exterior With Crossing T9s</option>
+				<option value="Shape 2">Shape 2</option>
+				<option value="UBarCap">U Bar + Cap</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Preview</div>
+		<div class="gridContent">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/c_scale,w_200/v1457670199/custom_txxyu9.png" ng-show="beam.shape=='Custom'">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1457411329/Sample_zavajb.png" ng-show="beam.shape=='Exterior With Crossing T9s'">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/c_scale,w_200/a_360/v1458855493/IMG_1183_atlhxv.jpg" ng-show="beam.shape=='Shape 2'">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1457750751/U_Bar_Plus_Cap_tcrcy6.png" ng-show="beam.shape=='UBarCap'">
+		</div>
+	</div>
+</div>
+
+<div class="highlight" ng-show="beam.type!='Circular'">
+	<b class="highlightHeader">Custom Builder</b>
+<div class="editGrid smallFlexibleTable"  ng-show="beam.shape == 'Custom'">
+	<div class="gridItem">
+		<div class="gridHead"># of Tie Parts</div>
+		<div class="gridContent">
+			<input type="text" ng-model="beam.numBars" placeholder="0" ng-change="setColumnBars(beam.numBars)" class="weightInput">
+			<!-- <b>Max # of Segments</b>
+			<input type="text" ng-model="beam.bar[$index].numSegments" ng-change="setColumnSegments(beam.bar[$index].numSegments)" class="weightInput"> -->
+		</div>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<div class="gridHead" ng-if="numColumnBars.length > 0" style="font-size: 18px; line-height: 22px;">Ties</div>
+		<div class="gridContent">
+			<div ng-repeat="bar in numColumnBars track by $index" class="columnBar">
+				<b class="barTitle">Bar {{$index+1}}</b>
+				<b>Length:</b> {{beam.bar[$index].totalLengthft || 0}}ft {{beam.bar[$index].totalLengthin || 0}}in
+
+				<span ng-if="beam.customBar[$index] == undefined" ng-init="beam.customBar[$index] = null"></span>
+
+				<div class="barMeta">
+					<div class="barMetaItem barMetaQty">
+						Qty<br>
+						<!-- <span ng-if="!beam.bar[$index].barQuantity" ng-init="beam.bar[$index].barQuantity=1"></span> -->
+						<input type="text" class="weightInput" ng-model="beam.bar[$index].barQuantity" ng-init="beam.bar[$index].barQuantity=1">
+					</div>
+					<div class="barMetaItem barPosition">
+						Bar Position<br>
+						<select ng-model="beam.customBar[$index].position" ng-change="setBeamShapeFields(); calculateBarLength(beam.bar[$index]);" ng-init="beam.customBar[$index].position='Exterior Tie'">
+							<option value="Exterior Tie">Exterior Tie</option>
+							<option value="Interior Tie">Interior Tie</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="barShape" ng-if="beam.shape=='Custom'">
+					<b>Bar Shape</b>
+					<div class="barShapeRadioSelect">
+						<label class="radioSelection">
+							<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1461882672/Custom_ielixu.png">
+							Custom
+							<input type="radio" ng-model="beam.customBar[$index].shape" value="Custom" 
+							ng-click="beam.bar[$index].segments = 0; beam.bar[$index] = null; beam.bar[$index].barQuantity = 1;">
+						</label>
+						<label class="radioSelection">
+							<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1461882389/t9Length_lkmiix.png">
+							Length T9
+							<input type="radio" ng-model="beam.customBar[$index].shape" value="LengthT9" 
+							ng-click="beam.bar[$index].segments = 3; setBeamShapeFields(); calculateBarLength(beam.bar[$index], 3)">
+						</label>
+						<label class="radioSelection">
+							<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1461882389/T9_ljtm8s.png">
+							Width T9
+							<input type="radio" ng-model="beam.customBar[$index].shape" value="WidthT9"
+							ng-click="beam.bar[$index].segments = 3; setBeamShapeFields(); calculateBarLength(beam.bar[$index], 3)">
+						</label>
+						<label class="radioSelection">
+							<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1461882389/ExteriorTie_hwaqid.png">
+							Exterior Tie
+							<input type="radio" ng-model="beam.customBar[$index].shape" value="exteriorTie"
+							ng-click="beam.bar[$index].segments = 6; setBeamShapeFields(); calculateBarLength(beam.bar[$index], 6)">
+						</label>
+					</div>
+				</div>
+
+				<div class="barMetaItem" ng-if="beam.customBar[$index].shape">
+					# of Segments<br>
+					<input type="text" ng-model="beam.bar[$index].segments" placeholder="0" class="weightInput">
+				</div>
+
+				<div class="editGrid smallFlexibleTable">
+					<!-- <span ng-if="!beam.bar[$index].segments" ng-init="beam.bar[$index].segments = 10"></span>
+					<span ng-init="beam.bar[$index].segments = 1"></span> -->
+
+					<div class="gridItem columnSegment" ng-repeat="segment in range(beam.bar[$index].segments) track by $index">
+						<div class="gridHead">Segment {{$index+1}}</div>
+						<div class="gridContent">
+				<input type="text" placeholder="0" class="weightInput" ng-model="beam.bar[$parent.$index][$index].ft" ng-init="beam.bar[$parent.$index][$index].ft = (beam.bar[$parent.$index][$index].ft || 0)" ng-change="calculateBarLength(beam.bar[$parent.$index], beam.bar[$parent.$index].segments)"> ft 
+				&nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="beam.bar[$parent.$index][$index].inches" ng-init="beam.bar[$parent.$index][$index].inches = (beam.bar[$parent.$index][$index].inches || 0)" ng-change="calculateBarLength(beam.bar[$parent.$index], beam.bar[$parent.$index.segments])"> in
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+</div>
+<!-- END CUSTOM TOOL -->
+
+<!-- OLD BEAM CUSTOM AREA -->
+<!-- <div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<div class="gridHead">Shape</div>
+		<div class="gridContent">
+			<select ng-model="beam.shape" ng-init="beam.shape='Custom'"  ng-change="setBeamShapeFields();handleBeamCustom();">
+				<option value="Custom">Custom</option>
+				<option value="UBarCap">U Bar + Cap</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Preview</div>
+		<div class="gridContent"> -->
+			<!-- IMAGES HERE -->
+<!-- 			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/c_scale,w_200/v1457670199/custom_txxyu9.png" ng-show="beam.shape=='Custom'">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1457750751/U_Bar_Plus_Cap_tcrcy6.png" ng-show="beam.shape=='UBarCap'">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Bars</div>
+		<div ng-show="beam.shape == 'Custom'">
+			<b># of Bars in column</b>
+			<input type="text" ng-model="beam.numBars" ng-change="setColumnBars(beam.numBars)" class="weightInput">
+			<b>Max # of Segments</b>
+			<input type="text" ng-model="beam.bar[$index].numSegments" ng-change="setColumnSegments(beam.bar[$index].numSegments)" class="weightInput">
+		</div>
+		<div class="gridContent">
+			<div ng-repeat="bar in numColumnBars track by $index"  class="columnBar">
+				<b>Bar {{$index+1}}</b><br>
+				<small>{{beam.bar[$index].totalLengthft}}ft {{beam.bar[$index].totalLengthin}}in</small>
+				<div class="editGrid smallFlexibleTable">
+					<div class="gridItem columnSegment" ng-repeat="segment in numColumnSegments track by $index">
+						<div class="gridHead">Segment {{$index+1}}</div>
+						<div class="gridContent">
+				<input type="text" placeholder="0" class="weightInput" ng-model="beam.bar[$parent.$index][$index].ft" ng-init="beam.bar[$parent.$index][$index].ft = ''" ng-change="calculateBarLength(beam.bar[$parent.$index])"> ft 
+				&nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="beam.bar[$parent.$index][$index].inches" ng-init="beam.bar[$parent.$index][$index].inches = ''" ng-change="calculateBarLength(beam.bar[$parent.$index])"> in
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div> -->
+<!-- END OLD BEAM CUSTOM AREA -->
+
+<div class="sections">
+	<b class="sectionsTitle">TIE SECTIONS ({{numSections.length}})</b>
+<div ng-repeat="section in numSections track by $index">
+	Section #{{$index+1}}
+	<div class="editGrid smallFlexibleTable tieSection">
+		<div class="gridItem">
+			<div class="gridHead">Distance</div>
+			<div class="gridContent">
+				<input type="text" placeholder="0" class="weightInput" ng-model="beam.section[$index].Distance"> ft &nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="beam.section[$index].DistanceInches"> in
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Spacing</div>
+			<div class="gridContent">
+				<input type="text" placeholder="0" class="weightInput" ng-model="beam.section[$index].Spacing"> ft &nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="beam.section[$index].SpacingInches"> in
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Quantity</div>
+			<div class="gridContent">
+				<input type="text" ng-model="beam.section[$index].Quantity" placeholder="0" class="quantityText">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Quantity Overide</div>
+			<div class="gridContent">
+				<input type="text" ng-model="beam.section[$index].QuantityOveride" placeholder="0" class="quantityText">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead"></div>
+			<div class="gridContent sectionHide">
+				<div>
+					<a ng-click="removeColumnSection($index)" class="verticalCenter"><i class="fa fa-times-circle"></i></a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+	<div class="editGrid smallFlexibleTable">
+		<a ng-click="addColumnSection()" class="button small">Add Another Section</a>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable">
+	<!-- JOB DEFAULT -->
+	<div class="gridItem">
+		<div class="gridHead">Interior Tie Size</div>
+		<div class="gridContent">
+			<select ng-model="beam.interiorTieSize">
+				<option value="4.25">3</option>
+				<option value="4.5">4</option>
+				<option value="5.5">5</option>
+				<option value="8">6</option>
+				<option value="9">7</option>
+				<option value="10.5">8</option>
+			</select>
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Interior Tie Grade</div>
+		<div class="gridContent">
+			<select ng-model="beam.interiorTieGrade">
+				<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+					{{grade.label}}
+				</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Exterior Tie Size</div>
+		<div class="gridContent">
+			<select ng-model="beam.exteriorTieSize">
+				<option value="4.25">3</option>
+				<option value="4.5">4</option>
+				<option value="5.5">5</option>
+				<option value="8">6</option>
+				<option value="9">7</option>
+				<option value="10.5">8</option>
+			</select>
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Exterior Tie Grade</div>
+		<div class="gridContent">
+			<select ng-model="beam.exteriorTieGrade">
+				<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+					{{grade.label}}
+				</option>
+			</select>
+		</div>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<div class="gridHead">Notes</div>
+		<div class="gridContent">
+			<textarea ng-model="beam.notes"></textarea>
+		</div>
+	</div>
+</div>
+
+
+<div class="previewAdder">
+	<b>PREVIEW</b>
+	<div ng-show="beam.topBar.barQuantity > 0 && (beam.topBar.stocklength > 0 || beam.topBar.stocklengthinches > 0)">
+		Stock Top Bars: {{beam.topBar.barQuantity}} x <small>{{beam.topBar.stocklength || 0}}ft {{beam.topBar.stocklengthinches || 0}}in</small>
+		{{beam.topBar.barWeight}}lbs
+	</div>
+	<div ng-show="beam.topBar.barExtraQuantity > 0 && (beam.topBar.barExtraLengthFt > 0 || beam.topBar.barExtraLengthIn > 0)">
+		Top Bars: {{beam.topBar.barExtraQuantity}} x <small>{{beam.topBar.barExtraLengthFt}}ft {{beam.topBar.barExtraLengthIn}}in</small>
+		{{beam.topBar.extraBarWeight}}lbs
+	</div>
+
+	<div ng-show="beam.midBar.barQuantity > 0 && (beam.midBar.stocklength > 0 || beam.midBar.stocklengthinches > 0)">
+		Stock Mid Bars: {{beam.midBar.barQuantity}} x <small>{{beam.midBar.stocklength || 0}}ft {{beam.midBar.stocklengthinches || 0}}in</small>
+		{{beam.midBar.barWeight}}lbs
+	</div>
+	<div ng-show="beam.midBar.barExtraQuantity > 0 && (beam.midBar.barExtraLengthFt > 0 || beam.midBar.barExtraLengthIn > 0)">
+		Mid Bars: {{beam.midBar.barExtraQuantity}} x <small>{{beam.midBar.barExtraLengthFt}}ft {{beam.midBar.barExtraLengthIn}}in</small>
+		{{beam.midBar.extraBarWeight}}lbs
+	</div>
+
+	<div ng-show="beam.bottomBar.barQuantity > 0 && (beam.bottomBar.stocklength > 0 || beam.bottomBar.stocklengthinches > 0)">
+		Stock Bottom Bars: {{beam.bottomBar.barQuantity}} x <small>{{beam.bottomBar.stocklength || 0}}ft {{beam.bottomBar.stocklengthinches || 0}}in</small>
+		{{beam.bottomBar.barWeight}}lbs
+	</div>
+	<div ng-show="beam.bottomBar.barExtraQuantity > 0 && (beam.bottomBar.barExtraLengthFt > 0 || beam.bottomBar.barExtraLengthIn > 0)">
+		Bottom Bars: {{beam.bottomBar.barExtraQuantity}} x <small>{{beam.bottomBar.barExtraLengthFt}}ft {{beam.bottomBar.barExtraLengthIn}}in</small>
+		{{beam.bottomBar.extraBarWeight}}lbs
+	</div>
+
+	<div ng-repeat="bar in numColumnBars track by $index">
+		<div ng-show="exteriorTieQuantity[$index] > 0 && (beam.bar[$index].totalLengthft > 0 || beam.bar[$index].totalLengthin > 0)">
+			Bar {{$index+1}}: {{exteriorTieQuantity[$index]}} x <small>{{beam.bar[$index].totalLengthft}}ft {{beam.bar[$index].totalLengthin}}in</small>
+			{{beam.bar[$index].barWeight}}lbs
+		</div>
+    </div>
+
+    <div class="totalToolWeight">
+    	--------<br>
+    	<b>Weight:</b> {{beamWeight | number:2}}lbs<br>
+    	<b>Tie Weight:</b> {{beamTieWeight | number:2}}lbs<br>
+    	--------<br>
+    	<b>Total Weight:</b> {{beamWeight + beamTieWeight | number:2}}
+    </div>
+
+</div>
+
+<div class="toolAddButton">
+	<input type="submit" class="button success" ng-click="addBeamBars(beam);" ng-disabled="beam.groupID == 'new group' && !group.title" value="Add">
+				<span ng-if="beam.groupID=='new group' && !group.title">Please Specifiy a Group</span>
+</div>
+
+</form>

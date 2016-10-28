@@ -1,0 +1,723 @@
+<span ng-init="contentLoaded=false"></span>
+
+<div ng-repeat="user in users | filter:{$id:userID}">
+
+<div class="singlePane" ng-if="!stateParams.estimateID">
+	<ul class="breadcrumbs">
+		<li><a ui-sref="/">Home</a></li>
+		<li>Add Estimate</li>
+	</ul>
+	<h3>ADD ESTIMATE</h3>
+
+	<form>
+		<label>
+			<b>JOB NAME</b>
+			<input type="text" class="largeText" ng-model="estimate.name" placeholder="Job Name">
+		</label>
+
+		<label>
+			<b>COMPANY / DIVISION</b>
+			<select ng-model="estimate.companyID" ng-init="estimate.companyID = user.companyBrowsing" ng-change="setEstimateCompanyID(estimate.companyID)" class="largeText">
+				<option value="{{company.$id}}" ng-repeat="company in companies" ng-if="adminOfCompany(company.$id)">{{company.name}}</option>
+				<option value="-New-">-New-</option>
+			</select>
+		</label>
+
+		<label>
+			<b>Starting Area / Group</b>
+			<input type="text" ng-model="estimate.firstGroup" placeholder="Area 1">
+			<small>Example: Ground Floor</small>
+		</label>
+
+		<label  ng-show="estimate.companyID == '-New-'">
+			<b>ADD NEW</b>
+			<div>
+				<input type="text" placeholder="Company / Division Name" ng-model="company.name"></input>
+			</div>
+		</label>
+
+		<button class="button success large" ng-click="addEstimate(estimate);"><i class='fa fa-plus-square'></i> Save &amp; Continue</button>
+	</form>
+
+</div>
+
+<!-- SELECT ESTIMATE -->
+<div class="singlePane" ng-if="stateParams.estimateID">
+<div ng-repeat="estimate in estimates | filter:{$id:stateParams.estimateID}">
+
+	<span ng-init="contentLoaded=true"></span>
+
+
+	<ul class="breadcrumbs">
+		<li><a ui-sref="/">Home</a></li>
+		<li><a ui-sref="estimates">Estimates</a></li>
+		<li><a href="#view/{{estimate.$id}}">{{estimate.name}}</a></li>
+		<li>Edit</li>
+	</ul>
+
+	<label>
+		<b>JOB NAME</b>
+		<input type="text" class="largeText" ng-model="estimate.name" placeholder="Job Name" ng-change="estimates.$save(estimate)">
+	</label>
+
+	<label>
+		<b>COMPANY / DIVISION</b>
+		<select ng-model="estimate.companyID" ng-change="estimates.$save(estimate)" class="largeText">
+			<option value="{{company.$id}}" ng-repeat="company in companies" ng-if="adminOfCompany(company.$id)">{{company.name}}</option>
+		</select>
+	</label>
+
+	<label>
+		<b>Job Notes</b>
+		<textarea ng-model="estimate.notes" ng-change="estimates.$save(estimate)" placeholder="Enter any job notes here" class="jobNotes"></textarea>
+	</label>
+
+	<div class="jobListingNumber">
+		 Estimate: #{{estimate.number}} &middot; Bid Date: {{estimate.date}}
+		 <!-- <input type="text" ng-init="estimate.number='test'" ng-model="estimate.number">
+		 <input type="text" initial-value="estimateNumber()" ng-model="estimate.date"> -->
+	</div>
+
+	<div class="jobPeople">
+		<label>
+			<b>Estimator</b>
+			<input type="text" ng-model="estimate.estimator" placeholder="Estimator" ng-change="estimates.$save(estimate)">
+		</label>
+
+		<label>
+			<b>Sales Person</b>
+			<input type="text" ng-model="estimate.salesPerson" placeholder="Sales Person" ng-change="estimates.$save(estimate)">
+		</label>
+
+		<label>
+			<b>Pricing Person</b>
+			<input type="text" ng-model="estimate.pricingPerson" placeholder="Pricing Person" ng-change="estimates.$save(estimate)">
+		</label>
+	</div>
+
+	<br>
+
+	<b>COSTING DETAILS</b>
+	<div class="jobPeople">
+		<!-- <label>
+			<b>Material <small>Cost / lb</small></b>
+			<div class="input-group">
+				<span class="input-group-label">$</span>
+				<input type="text" ng-model="estimate.materialCost" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" placeholder="0.00">
+				<span class="input-group-label">/lb</span>
+			</div>
+		</label> -->
+		<!-- <label>
+			<b>Fabrication <small>Cost / lb</small></b>
+			<div class="input-group">
+				<span class="input-group-label">$</span>
+				<input type="text" ng-model="estimate.fabricationCost" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" placeholder="0.00">
+				<span class="input-group-label">/lb</span>
+			</div>
+		</label> -->
+		<label>
+			<b>Grade <small>Cost / lb</small></b>
+			<div class="gridItem" style="display: flex; align-items: center;">
+				<a ng-click="user.setGradeCost=!user.setGradeCost; users.$save(user);" class="button">Set Grade Cost / lb</a>
+			</div>
+
+			<!-- GRADE COST / POUND MODAL -->
+			<div class="modalWindow" ng-show="user.setGradeCost">
+				<div class="modalWindowInner">
+					<h1>Grade Cost / Pound</h1>
+					<a class="button modalCloseButton"  ng-click="user.setGradeCost = false; users.$save(user);">Close</a>
+					<div class="highlight inlineItem" ng-repeat="grade in gradeOptions">
+						<b>{{grade.label}}</b>
+						<div class="input-group">
+							<span class="input-group-label">$</span>
+							<input 
+								type="text" 
+								ng-model="$parent.estimate.gradeCost[grade.value]" 
+								placeholder="0" 
+								ng-change="$parent.estimates.$save(estimate); reinit();"
+								ng-model-options="{debounce: {'default': 500} }"
+							>
+							<span class="input-group-label">/ lb</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- END MODAL -->
+			
+		</label>
+	</div>
+
+	<br>
+
+	<b>BENDS <small>Additional Cost / Bend Type</small></b>
+	<div class="jobPeople">
+		<label>
+			<b>Straight <small>extra Cost / lb</small></b>
+			<div class="input-group">
+				<span class="input-group-label">$</span>
+				<input type="text" ng-model="estimate.straightCost" placeholder="0.00" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }">
+				<span class="input-group-label">/lb</span>
+			</div>
+		</label>
+		<label>
+			<b>Light <small>extra Cost / lb</small></b>
+			<div class="input-group">
+				<span class="input-group-label">$</span>
+				<input type="text" ng-model="estimate.lightCost" placeholder="0.00" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }">
+				<span class="input-group-label">/lb</span>
+			</div>
+		</label>
+		<label>
+			<b>Heavy <small>extra Cost / lb</small></b>
+			<div class="input-group">
+				<span class="input-group-label">$</span>
+				<input type="text" ng-model="estimate.heavyCost" placeholder="0.00" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }">
+				<span class="input-group-label">/lb</span>
+			</div>
+		</label>
+		<label>
+			<b>Special <small>extra Cost / lb</small></b>
+			<div class="input-group">
+				<span class="input-group-label">$</span>
+				<input type="text" ng-model="estimate.specialCost" placeholder="0.00" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }">
+				<span class="input-group-label">/lb</span>
+			</div>
+		</label>
+	</div>
+
+	<br>
+
+	<b>DEFAULTS <small>can be changed per item</small></b>
+	<div class="editGrid smallFlexibleTable defaultsTable" style="margin: 0;">
+
+		<div class="gridItem">
+			<div class="gridHead">Grade</div>
+
+			<div class="gridContent">
+				<select ng-model="estimate.gradeDefault" ng-change="estimates.$save(estimate); setJobDefaults(estimate)">
+					<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+						{{grade.label}}
+					</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Stock Length</div>
+
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="ft" class="weightInput" ng-model="estimate.stocklength" ng-change="estimates.$save(estimate); setJobDefaults(estimate)" > ft &nbsp;&nbsp;
+				<input type="text" placeholder="in" ng-init="slab.group2.stocklengthinches = 0" class="weightInput" ng-model="estimate.stocklengthinches" ng-change="estimates.$save(estimate); setJobDefaults(estimate)"> in
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Diameter Over</div>
+			<div class="gridContent">
+				<input type="text" placeholder="0" class="weightInput" ng-model="estimate.diameterOver" ng-change="estimates.$save(estimate); setJobDefaults(estimate)"> ft &nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="estimate.diameterOverInches" ng-change="estimates.$save(estimate); setJobDefaults(estimate)"> in
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Size</div>
+			<div class="gridContent">
+				<span ng-if="!estimate.size" ng-init="estimate.size='4'"></span>
+				<select ng-model="estimate.size" ng-change="estimates.$save(estimate); setJobDefaults(estimate); setLaps(estimate)">
+					<option ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]" value="{{i}}">
+						{{i}}
+					</option>
+				</select>
+			</div>
+		</div>
+		<div class="gridItem" style="display: flex; align-items: center;">
+			<a ng-click="user.setLaps=!user.setLaps; users.$save(user);" class="button">Set Lap Defaults</a>
+		</div>
+		<div class="modalWindow" ng-show="user.setLaps">
+			<div class="modalWindowInner">
+				<h1>Lap Defaults</h1>
+				<a class="button modalCloseButton"  ng-click="user.setLaps = false; users.$save(user);">Close</a>
+				<div class="lapLengthDefaults">
+						<div class="lapLengthDefault" ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]">
+							<div><b>Size</b> {{i}}</div>
+							<div>
+								<span ng-init="estimate[i].size = i"></span>
+								<input type="hidden" ng-model="$parent.estimate[i].size">
+								<div class="gridItem">
+									<div class="gridHead">Lap <small>(diameter)</small></div>
+									<div class="gridContent noWrap">
+										<input type="text" placeholder="0" ng-model="$parent.estimate[i].diameter" ng-change="calculateLapLength($parent.estimate[i]); estimates.$save($parent.estimate);  setJobDefaults($parent.estimate)">
+									</div>
+								</div>
+
+								<div class="gridItem">
+									<div class="gridHead">Lap <small>(length)</small></div>
+									<div class="gridContent noWrap">
+										<input type="text" placeholder="0" ng-model="$parent.estimate[i].laplength" ng-change="calculateLapDiameter($parent.estimate[i]); estimates.$save($parent.estimate);  setJobDefaults($parent.estimate)">
+									</div>
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Interior Tie Size</div>
+			<div class="gridContent">
+				<select ng-model="estimate.interiorTieSize" ng-change="estimates.$save(estimate); setJobDefaults(estimate);">
+					<option value="4.25">3</option>
+					<option value="4.5">4</option>
+					<option value="5.5">5</option>
+					<option value="8">6</option>
+					<option value="9">7</option>
+					<option value="10.5">8</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Interior Tie Grade</div>
+			<div class="gridContent">
+				<select ng-model="estimate.interiorTieGrade" ng-change="estimates.$save(estimate); setJobDefaults(estimate);">
+					<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+						{{grade.label}}
+					</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Exterior Tie Size</div>
+			<div class="gridContent">
+				<select ng-model="estimate.exteriorTieSize" ng-change="estimates.$save(estimate); setJobDefaults(estimate);">
+					<option value="4.25">3</option>
+					<option value="4.5">4</option>
+					<option value="5.5">5</option>
+					<option value="8">6</option>
+					<option value="9">7</option>
+					<option value="10.5">8</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<!-- JOB DEFAULT -->
+			
+			<div class="gridHead">Exterior Tie Grade</div>
+			<div class="gridContent">
+				<select ng-model="estimate.exteriorTieGrade" ng-change="estimates.$save(estimate); setJobDefaults(estimate);">
+					<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+						{{grade.label}}
+					</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Waste</div>
+			<div class="gridContent">
+				<input type="text" class="weightInput" placeholder="0" ng-model="estimate.waste" ng-change="estimates.$save(estimate); setJobDefaults(estimate);">%
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Spacing</div>
+			<div class="gridContent noWrap">
+				<input type="text" class="weightInput" ng-model="estimate.spacing" placeholder="0" ng-change="estimates.$save(estimate); setJobDefaults(estimate)" > ft &nbsp;&nbsp;
+				<input type="text" class="weightInput" ng-model="estimate.spacinginches" placeholder="0" ng-change="estimates.$save(estimate); setJobDefaults(estimate)"> in
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Clearance</div> <!-- APPLIES TO ALL CLEARANACES -->
+			<div class="gridContent">
+				<input type="text" placeholder="0" class="weightInput" ng-model="estimate.clearance" ng-change="estimates.$save(estimate); setJobDefaults(estimate)"> ft &nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="estimate.clearanceInches" ng-change="estimates.$save(estimate); setJobDefaults(estimate);"> in
+			</div>
+		</div>
+
+	</div>
+
+	<div class="clear" style="height: 20px;"></div>
+
+	<b>INCREASED COST CONSIDERATIONS</b>
+	<div class="editGrid smallFlexibleTable defaultsTable" style="margin: 0;">
+
+		<div class="gridItem">
+			<div class="gridHead" data-tooltip="Add 10%-15% when working temperatures are below 40&deg; or above 95&deg;">Weather</div>
+			<div class="gridContent">
+				<input type="text" ng-model="estimate.weatherConsideration" placeholder="0" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" class="weightInput">%
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead" data-tooltip="Add 15%-25% for work on a ladder, scaffold, crawlspace, congested area, or other difficult workspaces.">Difficult Workspace</div>
+			<div class="gridContent">
+				<input type="text" ng-model="estimate.crawlspace" placeholder="0" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" class="weightInput">%
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead" data-tooltip="Add 1% for every 10ft that materials must be lifted">Material Lifting</div>
+			<div class="gridContent">
+				<input type="text" ng-model="estimate.heightAdjustments" placeholder="0" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" class="weightInput">%
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead" data-tooltip="Add 30%-50% on jobs where fitting and matching of materials is required, nearby areas have to be protected, and the job site is in use by others during construction">Job Site Interferences</div>
+			<div class="gridContent">
+				<input type="text" ng-model="estimate.interference" placeholder="0" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" class="weightInput">%
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead" data-tooltip="Add 25%-50% for work being done after a natural disaster (flood, tornado, earthquake, etc.).  Skilled tradesmen may not be readily available.">Natural Disasters</div>
+			<div class="gridContent">
+				<input type="text" ng-model="estimate.naturalDisasters" placeholder="0" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" class="weightInput">%
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead" data-tooltip="Add 10%-35% for Demanding Specifications, Strict Inspections, Inconsistent Suppliers, Inexperienced Architect, or Difficult Owner">Difficult Circumstances</div>
+			<div class="gridContent">
+				<input type="text" ng-model="estimate.difficultSuppliers" placeholder="0" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" class="weightInput">%
+			</div>
+		</div>
+
+
+	</div>
+
+	<br>
+
+	<h4 class="subContentPaneTitle">ITEMS IN JOB</h4>
+	<a href="#progress/{{estimate.$id}}" class="button">Progress Reports</a>
+	<a ng-click="user.savePDF = true; users.$save(user);" class="button secondary">Save PDF</a>
+
+	<div class="modalWindow" ng-show="user.savePDF">
+		<div class="modalWindowInner">
+			<h1>PDF Generator</h1>
+			<a class="button modalCloseButton" ng-click="user.savePDF = false; users.$save(user);">Close</a>
+			
+			<pdfgenerator></pdfgenerator>
+
+		</div>
+	</div>
+
+	<!-- <input type="text" placeholder="Filter..." class="contentPaneSearch"> -->
+
+	<div id="groupList" class="jobListing" ng-if="itemsLoaded" sortablejs>
+		<ul class="groupListings" sortablegroups>
+			<li class="group" id="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'" groupid="{{group.$id}}">
+				<div class="groupTitle" groupid="{{group.$id}}" ng-click="expandGroup(group.$id)" sortablegroups>
+					<div class="groupTitleHeader">
+						{{group.title}} 
+						<a class="groupEdit" ng-click="showEditGroup(group.$id)" ng-show="editGroup != group.$id"><i class="fa fa-pencil-square-o"></i></a> 
+						<span  ng-show="editGroup == group.$id">
+							<input type="text" ng-model="group.title" ng-change="groups.$save(group)"> 
+							<a class="button success tiny" ng-click="showEditGroup('none')">Close</a>
+						</span>
+						<div style="height: 1px;"></div>
+						<div class="groupInfo">
+							<div class="groupWeight">
+								<b>WEIGHT</b><br>
+								<!-- <b>{{itemsTotalWeight(estimate.$id, group.$id) | number:2}} lbs</b> -->
+								<span ng-init="group.totalWeight = 0; groups.$save(group);"></span>
+								{{group.totalWeight | number:2}} lbs
+							</div>
+							<div class="groupCost">
+							 	<b>MATERIAL COST</b><br>
+							 	<span ng-init="group.materialCost = 0; groups.$save(group);"></span>
+							 	{{group.materialCost | currency}}
+							 	<!-- <b>{{itemsTotalCost(estimate.$id, estimate, group.$id) | currency}}</b> -->
+							</div>
+							<div class="topGroupLaborCost">
+							 	<b>LABOR COST</b><br>
+							 	<span ng-init="group.laborCost = 0; groups.$save(group);"></span>
+							 	{{group.laborCost | currency}}
+							 	<!-- <b>{{itemsTotalCost(estimate.$id, estimate, group.$id) | currency}}</b> -->
+							</div>
+						</div>
+					</div>
+					<div class="text-right groupTitleButtons">
+						<a ng-click="removeGroup(group.$id); reinit();" class="groupRemove button secondary tiny">Remove</a>
+					</div>
+				</div>
+
+				<!-- ITEM TABLE -->
+				<section class="flexibleTable smallFlexibleTable" ng-show="group.$id == user.openGroup" sortablejs>
+					<ul class="sortableItems">
+
+						<!-- ITEM GROUP LOOP -->
+						<!-- <li 
+						  class="sortableItem itemGroupRow" 
+						  ng-repeat="itemGroup in itemGroups | filter:{estimateID:estimate.$id} | filter:{topGroupID:group.$id} | orderBy:'priority'" 
+						  itemgroupid="{{itemGroup.$id}}" groupid="{{itemGroup.$id}}"
+						> -->
+						<li 
+						  class="sortableItem itemGroupRow" 
+						  ng-repeat="itemGroup in itemGroups | startFrom: pagination.page * pagination.perPage | limitTo: pagination.perPage"
+						>
+						
+							<div class="row toolAddRow">
+								<div class="toolAdd">
+									<div class="toolAddTitle row-8">
+										{{itemGroup.tool || 'Group'}}
+										<!-- <select ng-model="itemGroup.topGroupID" ng-change="itemGroups.$save(itemGroup); reinit()">
+											<option value="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'">{{group.title}}</option>
+										</select> -->
+									</div>
+									<div class="groupPricing row-5">
+										<div class="itemGroupWeight">
+											<span ng-init="itemGroup.weight=0; itemGroups.$save(itemGroup)"></span>
+											<b>Weight</b><br>
+											{{itemGroup.weight | number:2}} lbs
+										</div>
+										<div class="itemGroupMultipliers">
+											<div>
+												<b>Multiplier</b><br>
+												{{itemGroup.multiplier}}<br>
+												<b>2nd Multiplier</b><br>
+												{{itemGroup.multiplier2}}
+											</div>
+										</div>
+										<div ng-if="itemGroup.tool == 'Slab' || itemGroup.tool == 'Vary' || itemGroup.tool=='Circular' || itemGroup.tool=='Mesh'">
+											<b>Negative</b><br>
+											<input type="checkbox" ng-model="itemGroup.itemsNegative" ng-change="itemGroups.$save(itemGroup); reinit();">
+										</div>
+										<div class="groupMaterialCost" style="visibility: hidden;">
+											<span ng-init="itemGroup.materialCost = 0; itemGroups.$save(itemGroup);"></span>
+											<b>Material Cost</b><br>
+											{{itemGroup.materialCost | currency}}
+										</div>
+										<div class="groupLaborCost" style="visibility: hidden;">
+											<span ng-init="itemGroup.laborCost = 0; itemGroups.$save(itemGroup);"></span>
+											<b>Labor Cost</b><br>
+											{{itemGroup.laborCost | currency}}
+										</div>
+									</div>
+									<div class="toolAddNotes row-4">
+										<textarea ng-model="itemGroup.notes" ng-change="itemGroups.$save(itemGroup)" ng-model-options="{debounce: {'default': 500} }"></textarea>
+									</div>
+									<div class="toolAddShowItems row-4" style="float: right;">
+										<a class="button secondary tiny" ng-click="editItemGroup(itemGroup); itemGroups.$remove(itemGroup); removeItems(itemGroup);">Edit</a>
+										<a class="button tiny"  ng-click="showItemGroup[itemGroup.$id]=!showItemGroup[itemGroup.$id]">Show Bars</a>
+										<a class="button warning tiny" ng-click="itemGroups.$remove(itemGroup); removeItems(itemGroup);" class="warning"><i class="fa fa-trash" aria-hidden="true"></i> Remove</a>
+									</div>
+								</div>
+								<div class="itemGroupItems" ng-show="showItemGroup[itemGroup.$id]">
+									<!-- ITEM LOOP -->
+									<div class="itemView" ng-repeat="item in items | filter:{group:itemGroup.$id}" itemid="{{item.$id}}">
+										<span ng-repeat="employeeGroup in employeeGroups | filter:{userID:userID, name:'Average Iron Worker'}">									
+											<span ng-repeat="rate in SACRates | filter:{$id:userID}">
+												<!-- MAIN ITEM TABLE -->
+												<div ng-if="!item.specialTool">
+													<itemtable></itemtable>
+												</div>
+												<div ng-if="item.specialTool == 'mesh'">
+													<meshtable></meshtable>
+												</div>
+											</span>
+
+										</span>
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+					<ul class="pagination"> 
+						<li ng-hide="pagination.page == 0"><a href="" ng-click="pagination.prevPage()">&laquo;</a></li>
+						<li ng-repeat="n in [] | range: pagination.numPages" ng-class="{active: n == pagination.page}">
+							<a href="" ng-click="pagination.toPageId(n)">{{n + 1}}</a>
+						</li>
+						<li ng-hide="pagination.page + 1 >= pagination.numPages"><a href="" ng-click="pagination.nextPage()">&raquo;</a></li>
+					</ul>
+				</section>
+
+			</li>
+
+				<!-- <li class="group" ng-show="filteredItems.length > 0">
+					<div class="groupTitle uncategorizedGroup" ng-click="expandGroup('misc')">
+						<span>
+							UNCATEGORIZED <small>These items will not show up until they are put in a group</small>
+						</span>
+					</div>
+
+					<section class="flexibleTable smallFlexibleTable" ng-show="user.openGroup == 'misc'">
+						<ul class="sortableItems">
+							<li class="sortableItem tableRow" ng-repeat="item in items | orderBy:'priority' | filter:hasGroupFilter() as filteredItems" itemid="{{item.$id}}" ng-if="!item.groupID || item.groupID == 'misc'">
+
+								<div class="row">
+									<itemtable></itemtable>
+								</div>
+
+							</li>
+						</ul>
+					</section>
+
+				</li> -->
+				
+			</ul>
+
+			<h4 class="totalTableHeader"><i class="fa fa-table" aria-hidden="true"></i> SUMMARY</h4>
+			<table class="bordered hover totalsTable stack">
+				<tr>
+					<th>Total Weight</th>
+					<td>
+						<span ng-init="estimate.totalWeight = 0; estimates.$save(estimate);"></span>
+						{{estimate.totalWeight | number:2}} lbs
+					</td>
+				</tr>
+				<tr>
+					<th>Material Cost</th>
+					<td>
+						<!-- {{itemsTotalCost(estimate.$id, estimate, 'all') | currency}} -->
+						<span ng-init="estimate.totalMaterialCost = 0; estimates.$save(estimate);"></span>
+						{{estimate.totalMaterialCost | currency}}
+					</td>
+				</tr>
+				<tr>
+					<th>Labor Cost</th>
+					<td>
+						<span ng-init="estimate.laborCost = 0; estimates.$save(estimate);"></span>
+						{{estimate.laborCost | currency}}
+					</td>
+				</tr>
+				<tr class="bottomLine">
+					<th>Breakeven Cost</th>
+					<span ng-if="estimate.laborCost && estimate.totalMaterialCost" ng-init="estimate.breakEvenCost = estimate.laborCost + estimate.totalMaterialCost; estimates.$save(estimate);"></span>
+					<td>
+						{{estimate.breakEvenCost | currency}}
+					</td>
+				</tr>
+				<tr class="markup">
+					<th>Markup</th>
+					<td>
+						<div class="input-group" style="width: 100px;">
+							<input type="text" ng-model="estimate.markup" ng-change="estimates.$save(estimate); reinit();" ng-model-options="{debounce: {'default': 500} }" >
+							<span class="input-group-label">%</span>
+						</div>
+					</td>
+				</tr>
+				<tr class="bottomLine">
+					<th>Final Bid</th>
+					<span ng-if="estimate.breakEvenCost && estimate.markup;" ng-init="estimate.finalBid = ((1+(estimate.markup)/100)) * estimate.breakEvenCost; estimates.$save(estimate);"></span>
+					<td>
+						{{estimate.finalBid | currency}}
+					</td>
+				</tr>
+				<tr>
+					<th>Gross Margin</th>
+					<span ng-if="estimate.finalBid && estimate.breakEvenCost" ng-init="estimate.grossMargin = (estimate.finalBid - estimate.breakEvenCost) / estimate.finalBid; estimates.$save(estimate);"></span>
+					<td>
+						{{estimate.grossMargin * 100 | number}}%
+					</td>
+				</tr>
+			</table>
+
+	</div>
+		<br>
+
+		<div id="addItemsArea" class="jobListing">
+
+		<!-- QUICK ADD TOOL -->
+		<h4>Add Tool</h4>
+
+		<div class="quickAdder">
+
+			<h4>Type <small style="float:right"><a class="closeTool" ng-click="setQuickAdd(false)"><i class="fa fa-times-circle"></i></a></small></h4>
+
+			<p>
+				<!-- <a class="button expand success" hotkey="{49: 'click'}" ng-class="{'active':userObject[0].adder == 'standard'}" ng-click="setAdder('standard')">Standard</a>
+				<a class="button expand success" hotkey="{50: 'click'}" ng-class="{'active':userObject[0].adder == 'lap'}" ng-click="setAdder('lap')">Lap</a>
+				<a class="button expand success" hotkey="{51: 'click'}" ng-class="{'active':userObject[0].adder == 'slab'}" ng-click="setAdder('slab')">Slab</a>
+				<a class="button expand success" hotkey="{52: 'click'}" ng-class="{'active':userObject[0].adder == 'circular'}" ng-click="setAdder('circular')">Circular</a>
+				<a class="button expand success" hotkey="{53: 'click'}" ng-class="{'active':userObject[0].adder == 'column'}" ng-click="setAdder('column')">Column</a>
+				<a class="button expand success" hotkey="{54: 'click'}" ng-class="{'active':userObject[0].adder == 'beam'}" ng-click="setAdder('beam')">Beam</a>
+				<a class="button expand success" hotkey="{55: 'click'}" ng-class="{'active':userObject[0].adder == 'vary'}" ng-click="setAdder('vary')">Vary</a> -->
+
+				<a class="button expand success" hotkey="{49: 'click'}" combo="16" ng-class="{'active':userObject[0].adder == 'standard'}" ng-click="setAdder('standard')">Standard</a>
+				<a class="button expand success" hotkey="{50: 'click'}" combo="16" ng-class="{'active':userObject[0].adder == 'lap'}" ng-click="setAdder('lap')">Lap</a>
+				<a class="button expand success" hotkey="{51: 'click'}" combo="16" ng-class="{'active':userObject[0].adder == 'slab'}" ng-click="setAdder('slab')">Slab</a>
+				<a class="button expand success" hotkey="{52: 'click'}" combo="16" ng-class="{'active':userObject[0].adder == 'circular'}" ng-click="setAdder('circular')">Circular</a>
+				<a class="button expand success" hotkey="{53: 'click'}" combo="16" ng-class="{'active':userObject[0].adder == 'column'}" ng-click="setAdder('column')">Column</a>
+				<a class="button expand success" hotkey="{54: 'click'}" combo="16" ng-class="{'active':userObject[0].adder == 'beam'}" ng-click="setAdder('beam')">Beam</a>
+				<a class="button expand success" hotkey="{55: 'click'}" combo="16" ng-class="{'active':userObject[0].adder == 'vary'}" ng-click="setAdder('vary')">Vary</a>
+				<a class="button expand success" hotkey="{56: 'click'}" combo="16" ng-class="{'active':userObject[0].adder == 'mesh'}" ng-click="setAdder('mesh')">Mesh</a>
+			</p>
+
+			<div class="slabAdder adder" ng-show="userObject[0].adder == 'standard'">
+				<div class="adderInput">
+					<standardtool></standardtool>
+				</div>
+			</div>
+
+
+			<div class="slabAdder adder" ng-show="userObject[0].adder == 'slab'">
+				<div class="adderInput">
+					<slabfields></slabfields>
+				</div>
+			</div>
+
+			<div class="lapAdder adder" ng-show="userObject[0].adder == 'lap'">
+				<section class="flexibleTable smallFlexibleTable">
+					<div class="adderInput">
+						<lapfields></lapfields>
+					</div>
+				</section>
+			</div>
+
+			<div class="lapAdder adder" ng-show="userObject[0].adder == 'column'">
+				<section class="flexibleTable smallFlexibleTable">
+					<div class="adderInput">
+						<columnfields></columnfields>
+					</div>
+				</section>
+			</div>
+
+			<div class="lapAdder adder" ng-show="userObject[0].adder == 'circular'">
+				<section class="flexibleTable smallFlexibleTable">
+					<div class="adderInput">
+						<circularfields></circularfields>
+					</div>
+				</section>
+			</div>
+
+			<div class="lapAdder adder" ng-show="userObject[0].adder == 'beam'">
+				<section class="flexibleTable smallFlexibleTable">
+					<div class="adderInput">
+						<beamfields></beamfields>
+					</div>
+				</section>
+			</div>
+
+			<div class="lapAdder adder" ng-show="userObject[0].adder == 'vary'">
+				<section class="flexibleTable smallFlexibleTable">
+					<div class="adderInput">
+						<varyfields></varyfields>
+					</div>
+				</section>
+			</div>
+
+			<div class="lapAdder adder" ng-show="userObject[0].adder == 'mesh'">
+				<section class="flexibleTable smallFlexibleTable">
+					<div class="adderInput">
+						<meshfields></meshfields>
+					</div>
+				</section>
+			</div>
+
+			<!-- <a ng-click="reset(); setJobDefaults(estimate);">Reset</a>
+			<a ng-click="setJobDefaults(estimate);">Job Defaults</a> -->
+
+		</div>
+
+		<br><br>
+
+</div>
+
+</div>
+<!-- END SELECT ESTIMATE -->
+
+</div>

@@ -1,0 +1,593 @@
+<form>
+
+<b>COLUMN TOOL</b>
+<div class="editGrid smallFlexibleTable" ng-init="setJobDefaults(estimate)">
+
+	<div class="gridItem">
+		<!-- Persistant Default -->
+		<span ng-init="column.groupID=user.groupID"></span>
+		<span ng-if="!column.groupID">
+			<span ng-init="$parent.column.groupID='new group'"></span>
+		</span>
+
+		<div class="gridHead">Group / Area</div>
+		<div class="gridContent">
+			<select ng-model="column.groupID" ng-change="user.groupID=column.groupID; users.$save(user);">
+				<option value="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'">{{group.title}}</option>
+				<option value="new group" ng-show="!column.$id">-- New --</option>
+			</select>
+			<input type="text" ng-model="group.title" placeholder="Group Name" ng-if="column.groupID == 'new group'">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Difficulty</div>
+		<div class="gridContent">
+			<select ng-model="column.difficulty" ng-init="column.difficulty = '1'">
+				<option ng-repeat="difficulty in difficultyLevels" value="{{difficulty.level}}">{{difficulty.level}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- PERSISTANT DEFAULT -->
+		<span ng-init="column.SACGroup=user.SACGroup"></span>
+		<span ng-if="!user.SACGroup">
+			<span ng-init="$parent.column.SACGroup=SACGroups[0].name"></span>
+		</span>
+
+		<div class="gridHead">SAC Group</div>
+		<div class="gridContent">
+			<select ng-model="column.SACGroup" ng-change="user.SACGroup=column.SACGroup;  user.SAC=null; users.$save(user);">
+				<option ng-repeat="group in SACGroups" value="{{group.name}}">{{group.name}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- PERSISTANT DEFAULT -->
+		<span ng-init="column.SAC=user.SAC"></span>
+		<span ng-if="!user.SAC" ng-repeat="code in SACCodes | filter:{group: column.SACGroup}">
+			<span ng-if="$index==0" ng-init="$parent.column.SAC=code.code"></span>
+		</span>
+
+		<div class="gridHead">SAC</div>
+		<div class="gridContent">
+			<select ng-model="column.SAC" ng-change="user.SAC=column.SAC; users.$save(user)">
+				<option ng-repeat="code in SACCodes | filter:{group: column.SACGroup}" value="{{code.code}}">{{code.code}} - {{code.description}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead" data-tooltip="How many times will this configuration be re-used">Multiplier <i class="fa fa-question-circle"></i></div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="column.multiplier=1" ng-model="column.multiplier">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead" data-tooltip="How many times will this configuration be re-used">Multiplier 2<i class="fa fa-question-circle"></i></div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="column.multiplier2=1" ng-model="column.multiplier2">
+		</div>
+	</div>
+
+</div>
+
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead"># of Verts</div>
+		<div class="gridContent noWrap">
+			<input type="text" id="startPointColumn" ng-model="column.numVerts" placeholder="0" class="weightInput">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Vert Size</div>
+		<div class="gridContent">
+			<select ng-model="column.size" ng-change="calculateLapLength(column); calculateLapDiameter(column); calculateHookSize(); setLaps(estimate)">
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+				<option value="11">11</option>
+				<option value="14">14</option>
+				<option value="18">18</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Grade</div>
+		<div class="gridContent">
+			<select ng-model="column.grade">
+				<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+					{{grade.label}}
+				</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Bend</div>
+		<div class="gridContent">
+			<select ng-model="column.lineType" ng-init="column.lineType='Straight'">
+				<option value="Straight">Straight</option>
+				<option value="Light Bend">Light Bend</option>
+				<option value="Heavy Bend">Heavy Bend</option>
+				<option value="Special Bend">Special Bend</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Vert Type</div>
+		<div class="gridContent">
+			<select ng-model="column.vertType" ng-init="column.vertType = 'Straight'">
+				<option value="Straight">Straight</option>
+				<option value="Straight (+ Lap Length)">Straight (+ Lap Length)</option>
+				<option value="Bent (+ Lap Length)">Bent (+ Lap Length)</option>
+				<option value="Bent (+ 90 Deg. Hook)">Bent (+ 90 Deg. Hook)</option>
+			</select>
+		</div>
+	</div>
+
+	<!-- <div class="gridItem" ng-show="column.vertType.indexOf('Lap Length') > -1">
+		<div class="gridHead">Stock Length</div>
+		<input type="text" placeholder="0" class="weightInput" ng-model="column.stocklength"> ft &nbsp;&nbsp;
+		<input type="text" placeholder="0" class="weightInput" ng-model="column.stocklengthinches"> in
+	</div> -->
+
+	<div class="gridItem" ng-if="column.vertType.indexOf('Lap Length') > -1">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Vert Lap <small>(diameter)</small></div>
+		<div class="gridContent noWrap">
+			<input type="text" class="weightInput" placeholder="0" ng-model="column.diameter"  ng-change="calculateLapLength(column);">
+		</div>
+	</div>
+
+	<div class="gridItem" ng-if="column.vertType.indexOf('Lap Length') > -1">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Vert Lap <small>(length)</small></div>
+		<div class="gridContent noWrap">
+			<input type="text" class="weightInput" placeholder="0" ng-model="column.laplength"  ng-change="calculateLapDiameter(column);"> in
+		</div>
+	</div>
+
+	<div class="gridItem" ng-if="column.vertType.indexOf('Hook') > -1">
+		<!-- RESET -->
+		<div class="gridHead">Hook Length</div>
+		<div class="gridContent noWrap">
+			<select ng-model="column.hookPreset" ng-init="column.hookPreset='none:0'" ng-change="setHook(column.hookPreset, column, 'hooklength')">
+				<option value="none:0">None</option>
+				<option ng-repeat="dimension in endDimensions | filter:{size:column.size || 'all'}:true" value="{{dimension.value}}">{{dimension.label}}</option>
+			</select>
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.hooklength"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.hooklengthinches"> in
+		</div>
+	</div>
+
+</div>
+
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Tie Clearance</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.tieLength"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.tieLengthInches"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Type</div>
+		<div class="gridContent">
+			<select ng-model="column.type" ng-init="column.type='Rectangular'" ng-change="handleCustom(); setShapeFields(); column.spiral=false;">
+				<option value="Rectangular">Rectangular</option>
+				<option value="Circular">Circular</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem" ng-if="column.type=='Circular'">
+		<div class="gridHead">Spiral?</div>
+		<input type="checkbox" ng-model="column.spiral">
+	</div>
+
+	<div class="gridItem" ng-if="column.spiral && column.type=='Circular'">
+		<div class="gridHead">Pitch</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.pitchFT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.pitchIN"> in
+		</div>
+	</div>
+
+	<div class="gridItem" ng-show="column.type=='Circular'">
+		<!-- RESET -->
+		<div class="gridHead">Diameter</div>
+		<div class="gridContent">
+			<input ng-if="column.type=='Circular'" type="text" placeholder="0" class="weightInput" ng-model="column.diameterFT"> ft &nbsp;&nbsp;
+			<input ng-if="column.type=='Circular'" type="text" placeholder="0" class="weightInput" ng-model="column.diameterIN"> in
+		</div>
+	</div>
+
+	<!-- <div class="gridItem">
+		<div class="gridHead">Diameter Over</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.diameterOver"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.diameterOverInches"> in
+		</div>
+	</div> -->
+
+	<div class="gridItem" ng-show="column.type=='Circular'">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Circular Tie Size</div>
+		<select ng-model="column.circularTie.size" ng-change="calculateLapLength(column.circularTie); calculateLapDiameter(column.circularTie);">
+			<option ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]" value="{{i}}">
+				{{i}}
+			</option>
+		</select>
+	</div>
+
+	<div class="gridItem" ng-show="column.type=='Circular' && !column.spiral">
+		<!-- Job Default -->
+		<div class="gridHead">Lap Diameter</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.circularTie.diameter" ng-change="calculateLapLength(column.circularTie)">
+		</div>
+	</div>
+
+	<div class="gridItem" ng-show="column.type=='Circular' && !column.spiral">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Lap Length</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.circularTie.laplength" ng-change="calculateLapDiameter(column.circularTie)"> in
+		</div>
+	</div>
+
+	<div class="gridItem" ng-show="column.type=='Rectangular'">
+		<!-- RESET -->
+		<div class="gridHead">Length</div>
+		<input type="text" placeholder="0" class="weightInput" ng-model="column.lengthFt"> ft &nbsp;&nbsp;
+		<input type="text" placeholder="0" class="weightInput" ng-model="column.lengthIn"> in
+	</div>
+
+	<div class="gridItem" ng-show="column.type=='Rectangular'">
+		<!-- RESET -->
+		<div class="gridHead">Width</div>
+		<input type="text" placeholder="0" class="weightInput" ng-model="column.width"> ft &nbsp;&nbsp;
+		<input type="text" placeholder="0" class="weightInput" ng-model="column.widthinches"> in
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Column Height</div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" class="weightInput" ng-model="column.height" ng-change="items.$save(item)" > ft &nbsp;&nbsp;
+			<input type="text" placeholder="in" class="weightInput" ng-model="column.heightinches" ng-change="items.$save(item)"> in
+		</div>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable" ng-show="column.type!='Circular'">
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Shape</div>
+		<div class="gridContent">
+			<select ng-model="column.shape" ng-init="column.shape='Custom'" ng-change="setShapeFields();handleCustom();">
+				<option value="Custom">Custom</option>
+				<option value="Exterior With Crossing T9s">Exterior With Crossing T9s</option>
+				<option value="Shape 2">Shape 2</option>
+				<option value="UBarCap">U Bar + Cap</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Preview</div>
+		<div class="gridContent">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/c_scale,w_200/v1457670199/custom_txxyu9.png" ng-show="column.shape=='Custom'">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1457411329/Sample_zavajb.png" ng-show="column.shape=='Exterior With Crossing T9s'">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/c_scale,w_200/a_360/v1458855493/IMG_1183_atlhxv.jpg" ng-show="column.shape=='Shape 2'">
+			<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1457750751/U_Bar_Plus_Cap_tcrcy6.png" ng-show="column.shape=='UBarCap'">
+		</div>
+	</div>
+</div>
+
+<div class="highlight" ng-show="column.type!='Circular'">
+	<b class="highlightHeader">Custom Builder</b>
+<div class="editGrid smallFlexibleTable"  ng-show="column.shape == 'Custom'">
+	<div class="gridItem">
+		<div class="gridHead"># of Tie Parts</div>
+		<div class="gridContent">
+			<input type="text" ng-model="column.numBars" placeholder="0" ng-change="setColumnBars(column.numBars)" class="weightInput">
+			<!-- <b>Max # of Segments</b>
+			<input type="text" ng-model="column.bar[$index].numSegments" ng-change="setColumnSegments(column.bar[$index].numSegments)" class="weightInput"> -->
+		</div>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<div class="gridHead" ng-if="numColumnBars.length > 0" style="font-size: 18px; line-height: 22px;">Ties</div>
+		<div class="gridContent">
+			<div ng-repeat="bar in numColumnBars track by $index" class="columnBar">
+
+				<b class="barTitle">Bar {{$index+1}}</b>
+				<b>Length:</b> {{column.bar[$index].totalLengthft || 0}}ft {{column.bar[$index].totalLengthin || 0}}in
+
+				<span ng-if="column.customBar[$index] == undefined" ng-init="column.customBar[$index] = null"></span>
+
+				<div class="barMeta">
+					<div class="barMetaItem barMetaQty">
+						Qty<br>
+						<!-- <span ng-if="!column.bar[$index].barQuantity" ng-init="column.bar[$index].barQuantity=1"></span> -->
+						<input type="text" class="weightInput" ng-model="column.bar[$index].barQuantity" ng-init="column.bar[$index].barQuantity=1">
+					</div>
+					<div class="barMetaItem barPosition">
+						Bar Position<br>
+						<select ng-model="column.customBar[$index].position" ng-change="setShapeFields(); calculateBarLength(column.bar[$index]);" ng-init="column.customBar[$index].position='Exterior Tie'">
+							<option value="Exterior Tie">Exterior Tie</option>
+							<option value="Interior Tie">Interior Tie</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="barShape" ng-if="column.shape=='Custom'">
+					<b>Bar Shape</b>
+					<div class="barShapeRadioSelect">
+						<label class="radioSelection">
+							<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1461882672/Custom_ielixu.png">
+							Custom
+							<input type="radio" ng-model="column.customBar[$index].shape" value="Custom" 
+							ng-click="column.bar[$index].segments = 0; column.bar[$index] = null; column.bar[$index].barQuantity = 1;">
+						</label>
+						<label class="radioSelection">
+							<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1461882389/t9Length_lkmiix.png">
+							Length T9
+							<input type="radio" ng-model="column.customBar[$index].shape" value="LengthT9" 
+							ng-click="column.bar[$index].segments = 3; setShapeFields(); calculateBarLength(column.bar[$index], 3)">
+						</label>
+						<label class="radioSelection">
+							<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1461882389/T9_ljtm8s.png">
+							Width T9
+							<input type="radio" ng-model="column.customBar[$index].shape" value="WidthT9"
+							ng-click="column.bar[$index].segments = 3; setShapeFields(); calculateBarLength(column.bar[$index], 3)">
+						</label>
+						<label class="radioSelection">
+							<img src="http://res.cloudinary.com/dsgmrzsui/image/upload/v1461882389/ExteriorTie_hwaqid.png">
+							Exterior Tie
+							<input type="radio" ng-model="column.customBar[$index].shape" value="exteriorTie"
+							ng-click="column.bar[$index].segments = 6; setShapeFields(); calculateBarLength(column.bar[$index], 6)">
+						</label>
+					</div>
+				</div>
+
+				<div class="barMetaItem" ng-if="column.customBar[$index].shape">
+					# of Segments<br>
+					<input type="text" ng-model="column.bar[$index].segments" placeholder="0" class="weightInput">
+				</div>
+
+				<div class="editGrid smallFlexibleTable">
+					<!-- <span ng-if="!column.bar[$index].segments" ng-init="column.bar[$index].segments = 10"></span>
+					<span ng-init="column.bar[$index].segments = 1"></span> -->
+
+					<div class="gridItem columnSegment" ng-repeat="segment in range(column.bar[$index].segments) track by $index">
+						<div class="gridHead">Segment {{$index+1}}</div>
+						<div class="gridContent">
+
+				<input type="text" placeholder="0" class="weightInput" ng-model="column.bar[$parent.$index][$index].ft" ng-change="calculateBarLength(column.bar[$parent.$index], column.bar[$parent.$index].segments)" ng-init="column.bar[$parent.$index][$index].ft = 0"> ft 
+				&nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="column.bar[$parent.$index][$index].inches" ng-change="calculateBarLength(column.bar[$parent.$index], column.bar[$parent.$index].segments)" ng-init="column.bar[$parent.$index][$index].inches = 0"> in
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+</div>
+
+<div class="sections" ng-show="!column.spiral">
+	<b class="sectionsTitle">TIE SECTIONS ({{numSections.length}})</b>
+<div ng-repeat="section in numSections track by $index">
+	Section #{{$index+1}}
+	<div class="editGrid smallFlexibleTable tieSection">
+		<div class="gridItem">
+			<div class="gridHead">Distance</div>
+			<div class="gridContent">
+				<input type="text" placeholder="0" class="weightInput" ng-model="column.section[$index].Distance"> ft &nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="column.section[$index].DistanceInches"> in
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Spacing</div>
+			<div class="gridContent">
+				<input type="text" placeholder="0" class="weightInput" ng-model="column.section[$index].Spacing"> ft &nbsp;&nbsp;
+				<input type="text" placeholder="0" class="weightInput" ng-model="column.section[$index].SpacingInches"> in
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Quantity</div>
+			<div class="gridContent">
+				<input type="text" ng-model="column.section[$index].Quantity" placeholder="0" class="quantityText">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Quantity Overide</div>
+			<div class="gridContent">
+				<input type="text" ng-model="column.section[$index].QuantityOveride" placeholder="0" class="quantityText">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead"></div>
+			<div class="gridContent sectionHide">
+				<div>
+					<a ng-click="removeColumnSection($index)" class="verticalCenter"><i class="fa fa-times-circle"></i></a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+	<div class="editGrid smallFlexibleTable">
+		<a ng-click="addColumnSection()" class="button small">Add Another Section</a>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable"  ng-show="column.type!='Circular'">
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Interior Tie Size</div>
+		<div class="gridContent">
+			<select ng-model="column.interiorTieSize">
+				<option value="4.25">3</option>
+				<option value="4.5">4</option>
+				<option value="5.5">5</option>
+				<option value="8">6</option>
+				<option value="9">7</option>
+				<option value="10.5">8</option>
+			</select>
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Interior Tie Grade</div>
+		<div class="gridContent">
+			<select ng-model="column.interiorTieGrade">
+				<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+					{{grade.label}}
+				</option>
+			</select>
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Exterior Tie Size</div>
+		<div class="gridContent">
+			<select ng-model="column.exteriorTieSize">
+				<option value="4.25">3</option>
+				<option value="4.5">4</option>
+				<option value="5.5">5</option>
+				<option value="8">6</option>
+				<option value="9">7</option>
+				<option value="10.5">8</option>
+			</select>
+		</div>
+	</div>
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Exterior Tie Grade</div>
+		<div class="gridContent">
+			<select ng-model="column.exteriorTieGrade">
+				<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+					{{grade.label}}
+				</option>
+			</select>
+		</div>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<div class="gridHead">Notes</div>
+		<div class="gridContent">
+			<textarea ng-model="column.notes"></textarea>
+		</div>
+	</div>
+</div>
+
+
+<div class="previewAdder">
+	<b>PREVIEW</b><br>
+
+	<!-- SET COLUMN TOTAL WEIGHT IN TEMPLATE -->
+	{{columnTotalWeight = 0;""}}
+
+	<div ng-show="mainBarQuantity > 0 && (column.stocklength > 0 || column.stocklengthinches > 0)">
+		Bars: {{mainBarQuantity}} x <small>{{column.stocklength || 0}}ft {{column.stocklengthinches}}in</small>
+		<small>
+			{{mainBarWeight = 
+			itemWeight({size:column.size,length:column.stocklength,lengthinches:column.stocklengthinches,quantity:mainBarQuantity,multiplier:1,secondmultiplier:1,waste:0});""
+			}}
+			{{mainBarWeight}}lbs
+		</small>
+	</div>
+
+	<div ng-show="spiralQuantity > 0 && (spiralLengthFT > 0 || spiralLengthIN > 0)">
+		Spiral Ties: {{spiralQuantity}} x <small>{{spiralLengthFT || 0}}ft {{spiralLengthIN || 0}}in</small>
+		{{spiralWeight || 0}}lbs
+	</div>
+
+	<div ng-repeat="bar in numColumnBars track by $index" ng-show="column.type!='Circular'">
+		<!-- {{exteriorTieQuantity}} -->
+		<div ng-show="(exteriorTieQuantity[$index] > 0 && (column.bar[$index].totalLengthft > 0 || column.bar[$index].totalLengthin > 0)) && column.customBar[$index].position == 'Exterior Tie'">
+			<b>Tie {{$index+1}}</b>: {{exteriorTieQuantity[$index]}} x <small>{{column.bar[$index].totalLengthft}}ft {{column.bar[$index].totalLengthin}}in</small>
+			<!-- {{tieWeight[$index] = itemWeight({size:sizeGrid[column.exteriorTieSize],length:column.bar[$index].totalLengthft,lengthinches:column.bar[$index].totalLengthin,quantity:exteriorTieQuantity[$index],multiplier:1,secondmultiplier:1,waste:0});""}} -->
+			{{column.bar[$index].barWeight}}lbs
+		</div>
+
+		<div ng-show="(exteriorTieQuantity[$index] > 0 && (column.bar[$index].totalLengthft > 0 || column.bar[$index].totalLengthin > 0)) && column.customBar[$index].position == 'Interior Tie'">
+			<b>Tie {{$index+1}}</b>: {{exteriorTieQuantity[$index]}} x <small>{{column.bar[$index].totalLengthft}}ft {{column.bar[$index].totalLengthin}}in</small>
+			<!-- {{tieWeight[$index] = itemWeight({size:sizeGrid[column.interiorTieSize],length:column.bar[$index].totalLengthft,lengthinches:column.bar[$index].totalLengthin,quantity:exteriorTieQuantity[$index],multiplier:1,secondmultiplier:1,waste:0});""}} -->
+			{{column.bar[$index].barWeight}}lbs
+		</div>
+    </div>
+    <div ng-show="column.type=='Circular' && exteriorTieQuantity[0] > 0 && (circularTieFT > 0 || circularTieIN > 0)">
+    	<b>Circular Tie:</b> {{exteriorTieQuantity[0]}} x <small>{{circularTieFT}}ft {{circularTieIN}}in</small>
+
+    	{{circularTieWeight = itemWeight({size:column.size,length:mainBarFT,lengthinches:mainBarIN,quantity:mainBarQuantity,multiplier:1,secondmultiplier:1,waste:0});""}}
+    	{{circularTieWeight}}lbs
+    </div>
+
+    <div class="totalToolWeight">
+    --------<br>
+    	<span ng-show="!column.spiral"><b>Tie Weight:</b> {{columnTieWeight | number:2}}lbs<br></span>
+    	{{columnTotalWeight = columnTotalWeight + mainBarWeight;""}}
+    	<span ng-if="column.type=='Circular' && exteriorTieQuantity[0] > 0 && (circularTieFT > 0 || circularTieIN > 0)">
+	    	{{columnTotalWeight = columnTotalWeight + circularTieWeight;""}}
+    	</span>
+    	<b>Bar Weight:</b> {{columnTotalWeight | number:2}}lbs<br>
+    --------<br>
+    	<b>Total Weight:</b> {{columnTotalWeight + columnTieWeight + spiralWeight | number:2}}lbs
+    </div>
+	<!-- <span ng-show="extraBarQuantity">Extra Bars: {{extraBarQuantity}} x <small>{{extraBarFt || 0 | number:2}}ft</small></span> -->
+	<!-- <div ng-show="column.shape=='Custom'">Exterior Tie: {{exteriorTieQuantity}} x <small>{{exteriorTieFt}}ft {{exteriorTieInches}}in</small></div> -->
+</div>
+
+<div class="toolAddButton">
+	<input type="submit" class="button success" ng-click="addColumnBars(column);" ng-disabled="column.groupID == 'new group' && !group.title" value="Add">
+				<span ng-if="column.groupID=='new group' && !group.title">Please Specifiy a Group</span>
+</div>
+
+</form>

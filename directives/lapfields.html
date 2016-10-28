@@ -1,0 +1,202 @@
+<form name="form">
+<div class="editGrid smallFlexibleTable" ng-init="setJobDefaults(estimate)">
+
+	<div class="gridItem">
+		<!-- Persistant Default -->
+		<span ng-init="lap.groupID=user.groupID"></span>
+		<span ng-if="!lap.groupID">
+			<span ng-init="$parent.lap.groupID='new group'"></span>
+		</span>
+
+		<div class="gridHead">Group / Area</div>
+		<div class="gridContent">
+			<select ng-model="lap.groupID"  ng-change="user.groupID=lap.groupID; users.$save(user);" required>
+				<option value="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'">{{group.title}}</option>
+				<option value="new group" ng-show="!lap.$id">-- New --</option>
+			</select>
+			<input type="text" ng-model="group.title" placeholder="Group Name" ng-if="lap.groupID == 'new group'">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Difficulty</div>
+		<div class="gridContent">
+			<select ng-model="lap.difficulty" ng-init="lap.difficulty='1'">
+				<option ng-repeat="difficulty in difficultyLevels" value="{{difficulty.level}}">{{difficulty.level}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- PERSISTANT DEFAULT -->
+		<span ng-init="lap.SACGroup=user.SACGroup"></span>
+		<span ng-if="!user.SACGroup">
+			<span ng-init="$parent.lap.SACGroup=SACGroups[0].name"></span>
+		</span>
+
+		<div class="gridHead">SAC Group</div>
+		<div class="gridContent">
+			<select ng-model="lap.SACGroup"  ng-change="user.SACGroup=lap.SACGroup;  user.SAC=null; users.$save(user);">
+				<option ng-repeat="group in SACGroups" value="{{group.name}}">{{group.name}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">SAC</div>
+		<!-- PERSISTANT DEFAULT -->
+		<span ng-init="lap.SAC=user.SAC"></span>
+		<span ng-if="!user.SAC" ng-repeat="code in SACCodes | filter:{group: lap.SACGroup}">
+			<span ng-if="$index==0" ng-init="$parent.lap.SAC=code.code"></span>
+		</span>
+
+		<div class="gridContent">
+			<select ng-model="lap.SAC" ng-change="user.SAC=lap.SAC; users.$save(user)">
+				<option ng-repeat="code in SACCodes | filter:{group: lap.SACGroup}" value="{{code.code}}">{{code.code}} - {{code.description}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Grade</div>
+		<div class="gridContent">
+			<select ng-model="lap.grade">
+				<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+					{{grade.label}}
+				</option>
+			</select>
+		</div>
+	</div>
+
+</div>
+
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Multiplier</div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="lap.multiplier=1" ng-model="lap.multiplier">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">2nd Multiplier</div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="lap.multiplier2=1" ng-model="lap.multiplier2">
+		</div>
+	</div>	
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Bend</div>
+		<div class="gridContent">
+			<select ng-model="lap.lineType" ng-init="lap.lineType='Straight'">
+				<option value="Straight">Straight</option>
+				<option value="Light Bend">Light Bend</option>
+				<option value="Heavy Bend">Heavy Bend</option>
+				<option value="Special Bend">Special Bend</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Size</div>
+		<div class="gridContent">
+			<select ng-model="lap.size" ng-change="calculateLapLength(lap); calculateLapDiameter(lap); setLaps(estimate);">
+				<option ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]" value="{{i}}">
+					{{i}}
+				</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET DEFAULT -->
+
+		<div class="gridHead">Length</div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" id="startPointLap" class="weightInput" ng-model="lap.toollength" ng-change="items.$save(item); setLaps(estimate)" > ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="lap.toollengthinches" ng-change="items.$save(item); setLaps(estimate)"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Stock</div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" class="weightInput" ng-model="lap.stocklength" ng-change="items.$save(item)" > ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="lap.stocklengthinches" ng-change="items.$save(item)"> in
+		</div>
+	</div>
+
+	<!-- STOCK > LENGTH CORRECTOR -->
+	<span ng-if="(convertToInches(lap.toollength, lap.toollengthinches) <= convertToInches(lap.stocklength, lap.stocklengthinches))" 
+			ng-init="lap.diameterOver=null; lap.diameterOverInches=null; lap.diameter=null; lap.laplength=null;"></span>
+
+	<div class="gridItem" ng-if="!(convertToInches(lap.toollength, lap.toollengthinches) <= convertToInches(lap.stocklength, lap.stocklengthinches))">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Diameter Over</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="lap.diameterOver"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="lap.diameterOverInches"> in
+		</div>
+	</div>
+
+	<div class="gridItem"  ng-if="!(convertToInches(lap.toollength, lap.toollengthinches) <= convertToInches(lap.stocklength, lap.stocklengthinches))">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Lap <small>(diameter)</small></div>
+		<div class="gridContent noWrap">
+			<input type="text" class="weightInput" placeholder="0" ng-model="lap.diameter" ng-change="calculateLapLength(lap)">
+		</div>
+	</div>
+	<div class="gridItem"  ng-if="!(convertToInches(lap.toollength, lap.toollengthinches) <= convertToInches(lap.stocklength, lap.stocklengthinches))">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Lap <small>(length)</small></div>
+		<div class="gridContent noWrap">
+			<input type="text" class="weightInput" placeholder="0" ng-model="lap.laplength" ng-change="calculateLapDiameter(lap)"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Notes</div>
+		<div class="gridContent">
+			<textarea ng-model="lap.notes" ng-change="items.$save(item)"></textarea>
+		</div>
+	</div>
+</div>
+
+<div class="previewAdder">
+	<div ng-show="mainBarQuantity > 0 && (lap.stocklength > 0 || lap.stocklengthinches > 0)">
+		Stock Bars: {{mainBarQuantity}} x <small>{{lap.stocklength || 0}}ft {{lap.stocklengthinches || 0}}in</small> <small>&middot; {{previewWeightMain}}lbs</small>
+	</div>
+	<div ng-show="extraBarQuantity > 0 && (extraBarFt > 0 || extraBarIn > 0)">
+		Bars: {{extraBarQuantity}} x <small>{{extraBarFt}}ft {{extraBarIn}}in</small> <small>&middot; {{previewWeightExtra}}lbs</small>
+	</div>
+	<div class="totalToolWeight">
+		<b>Total Weight:</b> {{totalToolWeight}}lbs
+	</div>
+</div>
+
+<div>
+<div class="toolAddButton">
+	<!-- <input type="submit" class="button success" ng-click="addLapBars(lap); setJobDefaults(estimate);" ng-disabled="lap.groupID == 'new group' && !group.title" value="Add"> -->
+	<input type="submit" class="button success" ng-click="addLapBars(lap);" ng-disabled="lap.groupID == 'new group' && !group.title" value="Add">
+	<span ng-if="lap.groupID=='new group' && !group.title">Please Specifiy a Group</span>
+</div>
+</div>
+</form>

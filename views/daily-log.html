@@ -1,0 +1,104 @@
+<div class="singlePane">
+
+	<ul class="breadcrumbs">
+		<li><a ui-sref="/">Home</a></li>
+		<li><a ui-sref="estimates">Estimates</a></li>
+		<li>{{estimate.name}} Daily Log</li>
+	</ul>
+
+	<h3 class="contentPaneTitle">{{estimate.name || 'Untitled'}}</h3>
+	<h5>DAILY LOG</h5>
+
+	<div class="jobListingNumber">
+		Bid Date: {{estimate.date}} &middot; Estimate: #{{estimate.number}}
+	</div>
+
+	<div class="logEntriesView logEntriesAdd">
+		<div class="logEntries" id="addEntryArea">
+
+			<entry></entry>
+
+			<div class="logEntry buttonZone">
+				<b>&nbsp;</b>
+				<div class="innerEntry">
+					<button ng-click="addEntry()" class="button success small expanded">Add Entry</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<h2 class="listHeader">Entries</h2>
+
+	<div class="logEntriesView">
+		<div class="logEntries" ng-repeat="entry in entries | orderBy:'-'">
+			<entry></entry>
+			<div class="logEntry buttonZone">
+				<b>&nbsp;</b>
+				<div class="innerEntry">
+					<a ng-click="removeEntry(entry.$id)" class="button warning small expanded">Remove</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- <div class="entryArea">
+		<h4>Add Work Entry</h4>
+		<div class="logEntries">
+			<div class="logEntry">
+				<div class="innerEntry">
+					<label>
+						SAC Code
+
+						<select ng-model="entry.SACCode" ng-init="initDefaults()">
+							<option ng-repeat="item in items | orderBy:'priority'" value="{{item.SAC}}.{{item.difficulty}}">{{item.SAC}}.{{item.difficulty}}</option>
+						</select>
+					</label>
+				</div>
+			</div>
+			<div class="logEntry">
+				<div class="innerEntry">
+					<label>
+						Employee
+						<select ng-model="entry.Employee">
+							<option ng-repeat="employee in employees" value="{{employee.$id}}">{{employee.name}}</option>
+							<option value="new">-New-</option>
+						</select>
+						<br>
+						<input type="text" ng-model="employee.name" ng-if="entry.Employee == 'new'" placeholder="Employee Name">
+					</label>
+				</div>
+			</div>
+			<div class="logEntry">
+				<div class="innerEntry">
+					<label>
+						Hours
+						<div class="input-group">
+							<input type="text" ng-model="entry.hours" placeholder="0"> 
+							<span class="input-group-label">hours</span>
+						</div>
+					</label>
+				</div>
+			</div>
+			<div class="logEntry">
+				<div class="innerEntry">
+					<label>
+						Date
+						<input type="text" ng-model="entry.date" ng-init="entry.date=currentDate()">
+					</label>
+				</div>
+			</div>
+			<div class="logEntry">
+				<div class="innerEntry">
+					<label>
+						Notes
+						<textarea ng-model="entry.notes" placeholder="Notes"></textarea>
+					</label>
+				</div>
+			</div>
+			<div class="logEntry logEntrySubmit">
+				
+			</div>
+		</div>
+	</div> -->
+
+</div>

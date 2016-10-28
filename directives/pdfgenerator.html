@@ -1,0 +1,32 @@
+<label>
+	Include Pricing
+	<input type="checkbox" ng-model="estimate.includeCosts" ng-change="estimates.$save(estimate)">
+</label>
+
+<!-- <b>PRESETS:</b>
+
+<div class="presetOptions">
+	<label>
+		Detailer
+		<input type="radio" ng-model="estimate.presetPDF" value="Detailer" ng-click="estimates.$save(estimate);">
+	</label>
+
+	<label>
+		Customer
+		<input type="radio" ng-model="estimate.presetPDF" value="Customer" ng-click="estimates.$save(estimate);">
+	</label>
+	{{estimate.presetPDF}}
+</div>
+
+<b>CUSTOMIZE PDF OUTPUT</b><br>
+Include in PDF:<br>
+<label>
+Material &amp; Labor Cost
+<input type="checkbox" ng-model="estimate.includeCosts" ng-click="estimates.$save(estimate);">
+</label>
+<label>
+	Weight
+	<input type="checkbox" ng-model="estimate.includeWeight" ng-click="estimates.$save(estimate);">
+</label> -->
+
+<a href="#view-pdf/{{estimate.$id}}" class="button success large">Generate PDF</a>

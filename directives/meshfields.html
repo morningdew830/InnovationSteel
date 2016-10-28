@@ -1,0 +1,156 @@
+<form name="form">
+<div class="editGrid smallFlexibleTable" ng-init="setJobDefaults(estimate)">
+
+	<div class="gridItem">
+		<!-- Persistant Default -->
+		<span ng-init="mesh.groupID=user.groupID"></span>
+		<span ng-if="!mesh.groupID">
+			<span ng-init="$parent.mesh.groupID='new group'"></span>
+		</span>
+
+		<div class="gridHead">Group / Area</div>
+		<div class="gridContent">
+			<select ng-model="mesh.groupID"  ng-change="user.groupID=mesh.groupID; users.$save(user);" required>
+				<option value="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'">{{group.title}}</option>
+				<option value="new group" ng-show="!mesh.$id">-- New --</option>
+			</select>
+			<input type="text" ng-model="group.title" placeholder="Group Name" ng-if="mesh.groupID == 'new group'">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Multiplier</div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="mesh.multiplier=1" ng-model="mesh.multiplier">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">2nd Multiplier</div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="mesh.multiplier2=1" ng-model="mesh.multiplier2">
+		</div>
+	</div>	
+</div>
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<!-- RESET DEFAULT -->
+
+		<div class="gridHead">Length (area)</div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" id="startPointMesh" class="weightInput" ng-model="mesh.lengthFT" ng-change="items.$save(item); setLaps(estimate)" > ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="mesh.lengthIN" ng-change="items.$save(item); setLaps(estimate)"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Width (area)</div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" class="weightInput" ng-model="mesh.widthFT" ng-change="items.$save(item); setLaps(estimate)" > ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="mesh.widthIN" ng-change="items.$save(item); setLaps(estimate)"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET DEFAULT -->
+
+		<div class="gridHead">Length (sheet)</div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" class="weightInput" ng-model="mesh.lengthSheetFT" ng-change="items.$save(item); setLaps(estimate)" > ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="mesh.lengthSheetIN" ng-change="items.$save(item); setLaps(estimate)"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Width (sheet)</div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" class="weightInput" ng-model="mesh.widthSheetFT" ng-change="items.$save(item); setLaps(estimate)" > ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="mesh.widthSheetIN" ng-change="items.$save(item); setLaps(estimate)"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Lap <small>(length)</small></div>
+		<div class="gridContent noWrap">
+			<input type="text" placeholder="0" class="weightInput" ng-model="mesh.laplength"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Waste</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="mesh.waste">%
+		</div>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<div class="gridHead">Mesh Size</div>
+		<div class="gridContent noWrap">
+			<select ng-model="mesh.size" ng-init="mesh.size = '4in x 4in - W1.4 x W1.4'">
+				<option value="{{meshThickness.title}}" ng-repeat="meshThickness in meshThicknesses">{{meshThickness.title}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Sheets / Man Hour</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="mesh.sheetsPerManHour">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Cost / Sheet</div>
+		<div class="gridContent">
+			$ <input type="text" class="weightInput" placeholder="0" ng-model="mesh.costPerSheet">
+		</div>
+	</div>
+
+</div>
+
+
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<div class="gridHead">Notes</div>
+		<div class="gridContent">
+			<textarea ng-model="mesh.notes" ng-change="items.$save(item)"></textarea>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Negative Area?</div>
+		<div class="gridContent">
+			<input type="checkbox" ng-model="mesh.itemsNegative">
+		</div>
+	</div>
+
+</div>
+
+<div class="previewAdder">
+	<div>
+		<b>Total Sheets:</b> {{totalSheets | number}}
+	</div>
+	<div>
+		<b>Total Weight:</b> {{totalWeight | number:2}}lbs
+	</div>
+</div>
+
+<div>
+<div class="toolAddButton">
+	<!-- <input type="submit" class="button success" ng-click="addLapBars(lap); setJobDefaults(estimate);" ng-disabled="mesh.groupID == 'new group' && !group.title" value="Add"> -->
+	<input type="submit" class="button success" ng-click="addMesh();" ng-disabled="mesh.groupID == 'new group' && !group.title" value="Add">
+	<span ng-if="mesh.groupID=='new group' && !group.title">Please Specifiy a Group</span>
+</div>
+</div>
+</form>

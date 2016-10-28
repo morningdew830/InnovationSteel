@@ -1,0 +1,45 @@
+<div class="logEntry">
+	<b>Group / Area</b>
+	<div class="innerEntry">
+		<select ng-model="entry.group" ng-init="initDefaults()" ng-change="entries.$save(entry)" class="groupArea">
+			<option ng-repeat="group in groups | orderBy:'priority'" value="{{group.$id}}">{{group.title}}</option>
+		</select>
+	</div>
+</div>
+<div class="logEntry">
+	<b>SAC Code</b>
+	<div class="innerEntry">
+		<select ng-model="entry.SACCode" ng-init="initDefaults()" ng-change="entries.$save(entry)">
+			<option ng-repeat="item in items | orderBy:'priority'" ng-if="item.groupID == entry.group" value="{{item.SAC}}.{{item.difficulty}}">{{item.SAC}}.{{item.difficulty}} - {{SACItem(item.SAC).description}}</option>
+		</select>
+	</div>
+</div>
+<div class="logEntry">
+	<b>Employee</b>
+	<div class="innerEntry">
+		<select ng-model="entry.Employee"  ng-change="entries.$save(entry)" id="entryEmployee">
+			<option ng-repeat="employee in employees" value="{{employee.$id}}" ng-show="isInJob(employee.$id, estimate.$id)">{{employee.name}} {{employee.lastName}}</option>
+		</select>
+	</div>
+</div>
+<div class="logEntry">
+	<b>Hours</b>
+	<div class="innerEntry">
+		<div class="input-group">
+			<input type="text" ng-model="entry.hours" placeholder="0"  ng-change="entries.$save(entry)"> 
+			<span class="input-group-label">hours</span>
+		</div>
+	</div>
+</div>
+<div class="logEntry">
+	<b>Date</b>
+	<div class="innerEntry">
+		<input type="text" ng-model="entry.date" ng-change="entries.$save(entry)">
+	</div>
+</div>
+<div class="logEntry">
+	<b>Notes</b>
+	<div class="innerEntry">
+		<textarea ng-model="entry.notes" placeholder="Notes"  ng-change="entries.$save(entry)"></textarea>
+	</div>
+</div>

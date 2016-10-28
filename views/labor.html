@@ -1,0 +1,273 @@
+<div class="singlePane" ng-if="!stateParams.estimateID">
+<div ng-repeat="user in users | filter:{$id:userID}">
+
+	<ul class="breadcrumbs">
+		<li><a ui-sref="/">Home</a></li>
+		<li>Labor Costs</li>
+	</ul>
+	<h3>Labor Costs</h3>
+
+	<div class="section">
+		<h4>Pounds / Man Day Rates</h4>
+		<a class="button" ng-click="user.showPoundsPerMan = !user.showPoundsPerMan; users.$save(user)">Set Pounds / Man Day Rates</a>
+
+		<!-- TODO: If user Doesn't Have Any Rates have button for them -->
+
+		<!-- GRADE COST / POUND MODAL -->
+		<div class="modalWindow" ng-show="user.showPoundsPerMan">
+			<div class="modalWindowInner">
+				<h1>Grade Cost / Pound</h1>
+				<a class="button modalCloseButton"  ng-click="user.showPoundsPerMan = false; users.$save(user);">Close</a>
+				<p><a ng-if="user.showPoundsPerMan" ng-click="setSACRateDefaults()"  confirm-click="Are you sure? This will delete any changes you have made." class="button">Set to Default</a></p>
+				<div ng-repeat="sacRate in SACRates | filter:{$id:userID}">
+					<table class="smallTable">
+						<tr>
+							<th>SAC Code</th>
+							<th>Difficulty 1</th>
+							<th>Difficulty 2</th>
+							<th>Difficulty 3</th>
+						</tr>
+						<tr ng-repeat="sac in SACCodes">
+							<td>{{sac.group}} - {{sac.code}} - {{sac.description}}</td>
+							<td><input type="text" ng-model="sacRate.rates[1][sac.code]" ng-change="SACRates.$save(sacRate)"></td>
+							<td><input type="text" ng-model="sacRate.rates[2][sac.code]" ng-change="SACRates.$save(sacRate)"></td>
+							<td><input type="text" ng-model="sacRate.rates[3][sac.code]" ng-change="SACRates.$save(sacRate)"></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- END MODAL -->
+
+	</div>
+
+<!-- <div class="section">
+	<form>
+		<label>
+			<b>Employee Group</b>
+			<input type="text" ng-model="employeeGroup.name">
+			<small>Example: Foreman, Steel Workers Group 1, Iron Workers Group 2, etc.</small>
+		</label>
+		<input type="submit" class="button" value="Add Group" ng-click="addEmployeeGroup(employeeGroup)">
+	</form>
+</div> -->
+
+<div class="section">
+	<h3>Existing Groups</h3>
+	<div ng-repeat="group in employeeGroups | filter:{userID:userID}" class="employeeGroup" ng-init="calculateGroup(group)">
+		<h4 class="employeeGroupTitle">{{group.name}}</h4>
+
+		<div class="editGrid smallFlexibleTable">
+
+			<!-- <div class="gridItem">
+				<div class="gridHead">Group Name</div>
+				<div class="gridContent">
+					<input type="text" ng-model="group.name" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div> -->
+
+			<div class="gridItem">
+				<div class="gridHead">Base Rate</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.baseRate" ng-change="employeeGroups.$save(group); calculateGroup(group)">/hr
+				</div>
+			</div>
+
+		</div>
+
+			<b>Paid Time Off</b>
+		<div class="editGrid smallFlexibleTable">
+			<div class="gridItem">
+				<div class="gridHead">Vacation Days</div>
+				<div class="gridContent">
+					<input type="text" ng-model="group.vacationDays" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Sick Days</div>
+				<div class="gridContent">
+					<input type="text" ng-model="group.sickDays" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Holidays</div>
+				<div class="gridContent">
+					<input type="text" ng-model="group.holidays" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+		</div>
+
+			<b>Payroll Taxes</b>
+		<div class="editGrid smallFlexibleTable">
+			
+			<div class="gridItem">
+				<div class="gridHead">FICA (Medicare)</div>
+				<div class="gridContent">
+					<!-- <b>Limit</b><br>
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.limitMedicare" ng-change="employeeGroups.$save(group); calculateGroup(group)"> -->
+					<br>
+					<input type="text" class="weightInput" placeholder="0" ng-model="group.medicarePercent" ng-change="employeeGroups.$save(group); calculateGroup(group)">%
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">FICA (Social Security)</div>
+				<div class="gridContent">
+					<b>Limit</b><br>
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.limitFica" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+					<br>
+					<input type="text" class="weightInput" placeholder="0" ng-model="group.ficaPercent" ng-change="employeeGroups.$save(group); calculateGroup(group)">%
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">FUTA</div>
+				<div class="gridContent">
+					<b>Limit</b><br>
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.limitFuta" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+					<br>
+					<input type="text" class="weightInput" placeholder="0" ng-model="group.futaPercent" ng-change="employeeGroups.$save(group); calculateGroup(group)">%
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">SUTA</div>
+				<div class="gridContent">
+					<b>Limit</b><br>
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.limitSuta" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+					<br>
+					<input type="text" class="weightInput" placeholder="0" ng-model="group.sutaPercent" ng-change="employeeGroups.$save(group); calculateGroup(group)">%
+				</div>
+			</div>
+
+		</div>
+
+			<b>Labor Driven Insurance</b>
+		<div class="editGrid smallFlexibleTable">
+			
+			<div class="gridItem">
+				<div class="gridHead">Workers Compensation</div>
+				<div class="gridContent">
+					<input type="text" class="weightInput" placeholder="0" ng-model="group.workersCompensation" ng-change="employeeGroups.$save(group); calculateGroup(group)">%
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">General Liability</div>
+				<div class="gridContent">
+					<input type="text" class="weightInput" placeholder="0" ng-model="group.generalLiability" ng-change="employeeGroups.$save(group); calculateGroup(group)">%
+				</div>
+			</div>
+
+		</div>
+
+			<b>Employer Paid Benefits</b>
+		<div class="editGrid smallFlexibleTable">
+			
+			<div class="gridItem">
+				<div class="gridHead">401K Match</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.fourOneK" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Health Benefits</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.healthBenefits" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+		</div>
+
+			<b>Other Labor Driven Burdens</b>
+		<div class="editGrid smallFlexibleTable">
+			
+			<div class="gridItem">
+				<div class="gridHead">Vehicle & Fuel</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.vehicleFuel" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Phone</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.phoneCosts" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Computer</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.computer" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Software</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.software" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Tools</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.tools" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Safety Equipment</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.safetyEquipment" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Bonus</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.bonus" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Other 1</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.other1" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Other 2</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.other2" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+
+			<div class="gridItem">
+				<div class="gridHead">Other 3</div>
+				<div class="gridContent">
+					$<input type="text" class="weightInput" placeholder="0.00" ng-model="group.other3" ng-change="employeeGroups.$save(group); calculateGroup(group)">
+				</div>
+			</div>
+		</div>
+
+		<b>TOTAL COST PER WORKING HOUR:</b>
+		{{group.costPerWorkingHour | currency}} / hour
+		<br>
+
+
+
+	<!-- <a ng-click="employeeGroups.$remove(group);">Remove</a> -->
+	</div>
+
+</div>
+
+</div>
+
+</div>

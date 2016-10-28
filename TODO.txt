@@ -1,0 +1,14 @@
+> Plan out registration and user setup process (Defaults & Settings pages)
+> Payment Account Processing (Subscriptions with potential coupons) 
+> Come up with Beta Testing procedures (bug reporting, feature requests), timeline, and goals 
+> Fix Design after Beta Testing Feedback, Clean up tool design a bit to make it more user friendly
+> Column tool Defaults to Columns SAC Group, same for other tools
+> Group / Area stays persistant on tools
+> Group items added by tool together in one group > All or nothing from a tool (remove all items)
+> Save PDF Tool > Email to Customer
+> Settings page allows for default values 
+> Double check all tools to make sure they are calculating correctly 
+---------------------------------------------------
+> Firebase Remember me feature 
+> Company / Division Management page (or add a new option to the estimate editing window) 
+> Default Group / Area (init to first if null otherwise default to ) 

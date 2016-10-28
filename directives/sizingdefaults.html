@@ -1,0 +1,189 @@
+<tr ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]">
+	<td>3</td>
+	<td>
+		<input type="hidden" ng-model="estimate[3].size" ng-init="estimate[3].size = 3" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[3].diameter" ng-change="calculateLapLength(estimate[3]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[3].laplength" ng-change="calculateLapDiameter(estimate[3]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>4</td>
+	<td>
+		<input type="hidden" ng-model="estimate[4].size" ng-init="estimate[4].size = 4" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[4].diameter" ng-change="calculateLapLength(estimate[4]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[4].laplength" ng-change="calculateLapDiameter(estimate[4]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>5</td>
+	<td>
+		<input type="hidden" ng-model="estimate[5].size" ng-init="estimate[5].size = 5" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[5].diameter" ng-change="calculateLapLength(estimate[5]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[5].laplength" ng-change="calculateLapDiameter(estimate[5]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>6</td>
+	<td>
+		<input type="hidden" ng-model="estimate[6].size" ng-init="estimate[6].size = 6" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[6].diameter" ng-change="calculateLapLength(estimate[6]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[6].laplength" ng-change="calculateLapDiameter(estimate[6]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>7</td>
+	<td>
+		<input type="hidden" ng-model="estimate[7].size" ng-init="estimate[7].size = 7" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[7].diameter" ng-change="calculateLapLength(estimate[7]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[7].laplength" ng-change="calculateLapDiameter(estimate[7]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>8</td>
+	<td>
+		<input type="hidden" ng-model="estimate[8].size" ng-init="estimate[8].size = 8" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[8].diameter" ng-change="calculateLapLength(estimate[8]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[8].laplength" ng-change="calculateLapDiameter(estimate[8]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>9</td>
+	<td>
+		<input type="hidden" ng-model="estimate[9].size" ng-init="estimate[9].size = 9" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[9].diameter" ng-change="calculateLapLength(estimate[9]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[9].laplength" ng-change="calculateLapDiameter(estimate[9]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>10</td>
+	<td>
+		<input type="hidden" ng-model="estimate[10].size" ng-init="estimate[10].size = 10" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[10].diameter" ng-change="calculateLapLength(estimate[10]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[10].laplength" ng-change="calculateLapDiameter(estimate[10]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>11</td>
+	<td>
+		<input type="hidden" ng-model="estimate[11].size" ng-init="estimate[11].size = 11" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[11].diameter" ng-change="calculateLapLength(estimate[11]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[11].laplength" ng-change="calculateLapDiameter(estimate[11]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>14</td>
+	<td>
+		<input type="hidden" ng-model="estimate[14].size" ng-init="estimate[14].size = 14" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[14].diameter" ng-change="calculateLapLength(estimate[14]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[14].laplength" ng-change="calculateLapDiameter(estimate[14]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+	<td>18</td>
+	<td>
+		<input type="hidden" ng-model="estimate[18].size" ng-init="estimate[18].size = 18" ng-change="estimate.$save()">
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(diameter)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[18].diameter" ng-change="calculateLapLength(estimate[18]); estimate.$save()">
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Lap <small>(length)</small></div>
+			<div class="gridContent noWrap">
+				<input type="text" placeholder="0" ng-model="estimate[18].laplength" ng-change="calculateLapDiameter(estimate[18]); estimate.$save()">
+			</div>
+		</div>
+	</td>
+</tr>

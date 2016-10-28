@@ -1,0 +1,143 @@
+<div class="editGrids">
+
+	<div class="editGrid">
+
+		<!-- <div class="gridItem">
+			<div class="gridHead">Group / Area</div>
+			<div class="gridContent">
+				<select ng-model="item.groupID">
+					<option value="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'">{{group.title}}</option>
+					<option value="new group" ng-show="!item.$id">-- New --</option>
+				</select>
+				<input type="text" ng-model="group.title" placeholder="Group Name" ng-if="item.groupID == 'new group'">
+			</div>
+		</div> -->
+
+		<div class="gridItem">
+			<div class="gridHead">Difficulty</div>
+			<div class="gridContent">
+				{{item.difficulty}}
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">SAC Group</div>
+			<div class="gridContent">
+				{{item.SACGroup}}
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">SAC</div>
+			<div class="gridContent">
+				{{item.SAC}}
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Quantity</div>
+			<div class="gridContent">
+				{{item.quantity}}
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Bend</div>
+			<div class="gridContent">
+				{{item.lineType}}
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Size</div>
+			<div class="gridContent">
+				{{item.size}}
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Length</div>
+			<div class="gridContent noWrap">
+				{{item.length}} ft &nbsp;&nbsp;
+				{{item.lengthinches}} in
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Grade</div>
+			<div class="gridContent">
+
+				<!-- SET DEFAULTS -->
+				<span ng-if="!item.grade" ng-init="item.grade=estimate.gradeDefault"></span>
+
+				{{item.grade}}
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Waste</div>
+			<div class="gridContent">
+				{{item.waste}}
+			</div>
+		</div>
+
+		<!-- <div class="gridItem">
+			<div class="gridHead">Notes</div>
+			<div class="gridContent">
+				<textarea ng-model="item.notes" ng-model-options="{debounce: {'default': 500} }" ng-change="reinit(); items.$save(item)"></textarea>
+			</div>
+		</div> -->
+	</div>
+
+	<div class="editGrid flexEnd">
+		<div class="gridItem">
+			<div class="gridHead">Weight</div>
+			<div class="gridContent">
+				<span ng-init="itemGroup.weight=itemWeight(item)+itemGroup.weight; itemGroups.$save(itemGroup)"></span>
+				<span ng-init="group.totalWeight=itemWeight(item)+group.totalWeight; groups.$save(group)"></span>
+				<span ng-init="estimate.totalWeight=itemWeight(item)+estimate.totalWeight; estimates.$save(estimate)"></span>
+				<span ng-init="item.weight=itemWeight(item); items.$save(item);"></span>
+				{{item.weight | number:2}} lbs
+			</div>
+		</div>
+
+		<div class="gridItem" ng-if="estimate.includeCosts">
+			<div class="gridHead">Material Cost</div>
+			<div class="gridContent">
+				<span ng-init="item.cost=itemCost(item,estimate); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative" ng-init="item.cost = item.cost * (-1); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative">
+					<span ng-init="itemGroup.materialCost=item.cost+itemGroup.materialCost; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.materialCost=item.cost+group.materialCost; groups.$save(group)"></span>
+					<span ng-init="estimate.totalMaterialCost=item.cost+estimate.totalMaterialCost; estimates.$save(estimate)"></span>
+				</span>
+				<span ng-if="!itemGroup.itemsNegative">
+					<span ng-init="itemGroup.materialCost=item.cost+itemGroup.materialCost; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.materialCost=item.cost+group.materialCost; groups.$save(group)"></span>
+					<span ng-init="estimate.totalMaterialCost=item.cost+estimate.totalMaterialCost; estimates.$save(estimate)"></span>
+				</span>
+				{{item.cost | currency}}
+			</div>
+		</div>
+
+		<div class="gridItem"  ng-if="estimate.includeCosts">
+			<div class="gridHead">Labor Cost</div>
+			<div class="gridContent">
+				<span ng-init="item.laborCost=laborCost(item, estimate, employeeGroup.costPerWorkingHour, rate.rates[item.difficulty][item.SAC]); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative" ng-init="item.laborCost = item.laborCost * (-1); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative">
+					<span ng-init="itemGroup.laborCost=item.laborCost+itemGroup.laborCost; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.laborCost=item.laborCost+group.laborCost; groups.$save(group)"></span>
+					<span ng-init="estimate.laborCost=item.laborCost+estimate.laborCost; estimates.$save(estimate)"></span>
+				</span>
+				<span ng-if="!itemGroup.itemsNegative">
+					<span ng-init="itemGroup.laborCost=item.laborCost+itemGroup.laborCost; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.laborCost=item.laborCost+group.laborCost; groups.$save(group)"></span>
+					<span ng-init="estimate.laborCost=item.laborCost+estimate.laborCost; estimates.$save(estimate)"></span>
+				</span>
+				{{item.laborCost | currency}}
+			</div>
+		</div>
+	</div>
+
+</div>

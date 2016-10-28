@@ -1,0 +1,236 @@
+<form>
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<!-- Persistant Default -->
+		<span ng-init="circular.groupID=user.groupID"></span>
+		<span ng-if="!circular.groupID">
+			<span ng-init="$parent.circular.groupID='new group'"></span>
+		</span>
+
+		<div class="gridHead">Group / Area</div>
+		<div class="gridContent">
+			<select ng-model="circular.groupID" ng-change="user.groupID=circular.groupID; users.$save(user);">
+				<option value="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'">{{group.title}}</option>
+				<option value="new group" ng-show="!circular.$id">-- New --</option>
+			</select>
+			<input type="text" ng-model="group.title" placeholder="Group Name" ng-if="circular.groupID == 'new group'">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Difficulty</div>
+		<div class="gridContent">
+			<select ng-model="circular.difficulty" ng-init="circular.difficulty = '1'">
+				<option ng-repeat="difficulty in difficultyLevels" value="{{difficulty.level}}">{{difficulty.level}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- PERSISTANT DEFAULT -->
+		<span ng-init="circular.SACGroup=user.SACGroup"></span>
+		<span ng-if="!user.SACGroup">
+			<span ng-init="$parent.circular.SACGroup=SACGroups[0].name"></span>
+		</span>
+
+		<div class="gridHead">SAC Group</div>
+		<div class="gridContent">
+			<select ng-model="circular.SACGroup" ng-change="user.SACGroup=circular.SACGroup;  user.SAC=null; users.$save(user);">
+				<option ng-repeat="group in SACGroups" value="{{group.name}}">{{group.name}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- PERSISTANT DEFAULT -->
+		<span ng-init="circular.SAC=user.SAC"></span>
+		<span ng-if="!user.SAC" ng-repeat="code in SACCodes | filter:{group: circular.SACGroup}">
+			<span ng-if="$index==0" ng-init="$parent.circular.SAC=code.code"></span>
+		</span>
+
+		<div class="gridHead">SAC</div>
+		<div class="gridContent">
+			<select ng-model="circular.SAC" ng-change="user.SAC=circular.SAC; users.$save(user)">
+				<option ng-repeat="code in SACCodes | filter:{group: circle.SACGroup}" value="{{code.code}}">{{code.code}} - {{code.description}}</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead" data-tooltip="How many times will this configuration be re-used">Multiplier <i class="fa fa-question-circle"></i></div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="circular.multiplier=1" ng-model="circular.multiplier">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">2nd Multiplier</div>
+		<div class="gridContent">
+			<input type="text" class="quantityText" ng-init="circular.multiplier2=1" ng-model="circular.multiplier2">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Waste</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" ng-model="circular.waste">%
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Bar Direction</div>
+		<div class="gridContent">
+			<select ng-model="circular.barDirection" ng-init="circular.barDirection='2'">
+				<option value="2">2 Way Bar</option>
+				<option value="1">1 Way Bar</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Grade</div>
+		<div class="gridContent">
+			<select ng-model="circular.grade">
+				<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+					{{grade.label}}
+				</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Bend</div>
+		<div class="gridContent">
+			<select ng-model="circular.lineType" ng-init="circular.lineType='Straight'">
+				<option value="Straight">Straight</option>
+				<option value="Light Bend">Light Bend</option>
+				<option value="Heavy Bend">Heavy Bend</option>
+				<option value="Special Bend">Special Bend</option>
+			</select>
+		</div>
+	</div>
+
+</div>
+
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<!-- RESET -->
+		<div class="gridHead">Radius</div>
+		<div class="gridContent">
+			<input type="text" id="startPointCircular" placeholder="0" class="weightInput" ng-model="circular.radiusFT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="circular.radiusIN"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Spacing</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="circular.spacingFT"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="circular.spacingIN"> in
+		</div>
+	</div>
+</div>
+
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Stock Length</div>
+		<input type="text" placeholder="0" class="weightInput" ng-model="circular.stocklength" ng-init="circular.stocklength=20"> ft &nbsp;&nbsp;
+		<input type="text" placeholder="0" class="weightInput" ng-model="circular.stocklengthinches"> in
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Diameter Over</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="circular.diameterOver"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="0" class="weightInput" ng-model="circular.diameterOverInches"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Lap Diameter</div>
+		<div class="gridContent">
+			<input type="text" class="weightInput" placeholder="0" class="weightInput" ng-model="circular.diameter" ng-change="calculateLapLength(circular)">
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Lap Length</div>
+		<div class="gridContent">
+			<input type="text" placeholder="0" class="weightInput" ng-model="circular.laplength" ng-change="calculateLapDiameter(circular)"> in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Bar Size</div>
+		<div class="gridContent">
+			<select ng-model="circular.size" ng-change="calculateLapLength(circular); calculateLapDiameter(circular); setLaps(estimate)">
+				<option ng-repeat="i in [3,4,5,6,7,8,9,10,11,14,18]" value="{{i}}">
+					{{i}}
+				</option>
+			</select>
+		</div>
+	</div>
+
+</div>
+
+<div class="editGrid smallFlexibleTable">
+	<div class="gridItem">
+		<div class="gridHead">Notes</div>
+		<div class="gridContent">
+			<textarea ng-model="circular.notes"></textarea>
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Negative Area?</div>
+		<div class="gridContent">
+			<input type="checkbox" ng-model="circular.itemsNegative">
+		</div>
+	</div>
+
+</div>
+
+
+<div class="previewAdder">
+	<b>PREVIEW</b><br>
+	<div ng-show="mainBarQuantity > 0 && (mainBarFT > 0 || mainBarIN > 0)">
+		Stock Bars: {{mainBarQuantity}} x <small>{{mainBarFT || 0}}ft {{mainBarIN || 0}}in <!-- ({{mainBar}}) --></small>
+		<small>&middot; 
+			{{mainBarWeight = itemWeight({size:circular.size,length:mainBarFT,lengthinches:mainBarIN,quantity:mainBarQuantity,multiplier:1,secondmultiplier:1,waste:circular.waste});""}}
+			{{mainBarWeight}}lbs
+		</small>
+	</div>
+	<div ng-show="extraBarQuantity > 0 && (extraBarFt > 0 || extraBarIn > 0)">
+		Bars: {{extraBarQuantity}} x <small>{{extraBarFt || 0}}ft {{extraBarIn || 0}}in <!-- ({{extraBar}}) --></small>
+		<small>&middot; 
+			{{extraBarWeight = itemWeight({size:circular.size,length:extraBarFt,lengthinches:extraBarIn,quantity:extraBarQuantity,multiplier:1,secondmultiplier:1,waste:circular.waste});""}}
+			{{extraBarWeight}}lbs
+		</small>
+	</div>
+	<div class="totalToolWeight">
+		<b>Total Weight:</b> {{mainBarWeight + extraBarWeight | number:2}}lbs
+	</div>
+
+</div>
+
+<div class="toolAddButton">
+	<input type="submit" class="button success" ng-click="addCircularItems(circular);" ng-disabled="circular.groupID == 'new group' && !group.title" value="Add">
+				<span ng-if="circular.groupID=='new group' && !group.title">Please Specifiy a Group</span>
+</div>
+</form>

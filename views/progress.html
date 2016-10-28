@@ -1,0 +1,71 @@
+<div class="singlePane">
+
+	<ul class="breadcrumbs">
+		<li><a ui-sref="/">Home</a></li>
+		<li><a ui-sref="estimates">Estimates</a></li>
+		<li>{{estimate.name}}</li>
+		<li>Progress</li>
+	</ul>
+
+	<h3 class="contentPaneTitle">{{estimate.name || 'Untitled'}} - Reports <a href="#edit/{{estimate.$id}}" class="button">Edit</a></h3>
+
+	<div class="jobListingNumber">
+		Bid Date: {{estimate.date}} &middot; Estimate: #{{estimate.number}}
+	</div>
+
+	<div class="backgroundCalculations">
+		{{percentageFinished = completedWeight(estimate.$id, 'all') / itemsTotalWeight(estimate.$id, 'all')}}
+	</div>
+	<b>JOB PROGRESS</b>
+	<div class="text-center"><b>{{completedWeight(estimate.$id, 'all') | number:2}} lbs / {{itemsTotalWeight(estimate.$id, 'all') | number:2}} lbs</b></div>
+	<div class="progress" role="progressbar" tabindex="0" aria-valuenow="{{percentageFinished | percentage:0}}" aria-valuemin="0" aria-valuetext="{{percentageFinished | percentage:0}} percent" aria-valuemax="100">
+	  <span class="progress-meter" style="width: {{percentageFinished | percentage:0}}%" ng-show="percentageFinished > 0">
+	    <p class="progress-meter-text">{{percentageFinished | percentage:0}}%</p>
+	  </span>
+	</div>
+
+	<div class="tableGroup" ng-repeat="group in groups | orderBy:'priority'">
+		<div class="tableGroupTitle">{{group.title}}</div>
+		<section class="flexibleTable">
+			<div class="tableRow" ng-repeat="item in items | orderBy:'priority'" ng-if="item.groupID == group.$id">
+				<div class="tableCell">
+					<div class="tableHead">SACCodes</div>
+					<div class="tableCellContent">
+						{{item.SAC}}.{{item.difficulty}} - {{SACItem(item.SAC).description}}
+					</div>
+				</div>
+				<div class="tableCell">
+					<div class="tableHead">Total Weight</div>
+					<div class="tableCellContent">
+						{{totalWeightItem(item.$id) | number:2}} lbs
+					</div>
+				</div>
+				<div class="tableCell">
+					<div class="tableHead">Total Hours</div>
+					<div class="tableCellContent">
+						{{totalHoursSAC(item.SAC) || 0 | number:0}} hours
+					</div>
+				</div>
+				<div class="tableCell">
+					<div class="tableHead">Work Complete?</div>
+					<div class="tableCellContent">
+						<input type="checkbox" ng-model="item.finished" ng-change="items.$save(item)">
+					</div>
+				</div>
+				<div class="tableCell">
+					<div class="tableHead">Pounds / Hour</div>
+					<div class="tableCellContent">
+						<span ng-if="item.finished">
+							{{totalPoundsPerHour(item.SAC) || 0 | number:2}} lbs / hour
+						</span>
+						<span ng-if="!item.finished">
+							Not Yet Complete						
+						</span>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+
+</div>

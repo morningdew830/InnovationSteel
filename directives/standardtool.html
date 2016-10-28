@@ -1,0 +1,282 @@
+<form>
+<section class="flexibleTable smallFlexibleTable" ng-init="setJobDefaults(estimate)">
+	<div class="row greyBG">
+		<div class="editGrids">
+
+			<div class="editGrid">
+
+				<div class="gridItem">
+					<!-- HANDLE DEFAULTS -->
+					<span ng-init="standard.groupID=user.groupID"></span>
+					<span ng-if="!user.groupID">
+						<span ng-init="$parent.standard.groupID='new group'"></span>
+					</span>
+
+					<div class="gridHead">Group / Area</div>
+					<div class="gridContent">
+						<select ng-model="standard.groupID" ng-change="user.groupID=standard.groupID; users.$save(user);">
+							<option value="{{group.$id}}" ng-repeat="group in groups | orderBy: 'priority'">{{group.title}}</option>
+							<option value="new group" ng-show="!standard.$id">-- New --</option>
+						</select>
+						<input type="text" ng-model="group.title" placeholder="Group Name" ng-if="standard.groupID == 'new group'">
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<!-- DEFAULTS -->
+					<span ng-init="standard.difficulty='1'"></span>
+
+					<div class="gridHead">Difficulty</div>
+					<div class="gridContent">
+						<select ng-model="standard.difficulty" >
+							<option ng-repeat="difficulty in difficultyLevels" value="{{difficulty.level}}">{{difficulty.level}}</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<!-- HANDLE DEFAULTS -->
+					<span ng-init="standard.SACGroup=user.SACGroup"></span>
+					<span ng-if="!user.SACGroup">
+						<span ng-init="$parent.standard.SACGroup=SACGroups[0].name"></span>
+					</span>
+
+					<div class="gridHead">SAC Group</div>
+					<div class="gridContent">
+						<select ng-model="standard.SACGroup" ng-change="user.SACGroup=standard.SACGroup;  user.SAC=null; users.$save(user);">
+							<option ng-repeat="group in SACGroups" value="{{group.name}}">{{group.name}}</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<!-- HANDLE DEFAULTS -->
+					<span ng-init="standard.SAC=user.SAC"></span>
+					<span ng-if="!user.SAC" ng-repeat="code in SACCodes | filter:{group: standard.SACGroup}">
+						<span ng-if="$index==0" ng-init="$parent.standard.SAC=code.code"></span>
+					</span>
+
+					<div class="gridHead">SAC</div>
+					<div class="gridContent">
+						<select ng-model="standard.SAC" ng-change="user.SAC=standard.SAC; users.$save(user)">
+							<option ng-repeat="code in SACCodes | filter:{group: standard.SACGroup}" value="{{code.code}}">{{code.code}} - {{code.description}}</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<div class="gridHead">Grade</div>
+					<div class="gridContent">
+
+						<!-- SET DEFAULTS -->
+						<span ng-if="!standard.grade" ng-init="standard.grade=estimate.gradeDefault"></span>
+
+						<select ng-model="standard.grade">
+							<option ng-repeat="grade in gradeOptions" value="{{grade.value}}">
+								{{grade.label}}
+							</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<!-- HANDLE DEFAULTS -->
+					<span ng-init="standard.lineType='Straight'"></span>
+
+					<div class="gridHead">Bend</div>
+					<div class="gridContent">
+						<select ng-model="standard.lineType">
+							<option value="Straight">Straight</option>
+							<option value="Light Bend">Light Bend</option>
+							<option value="Heavy Bend">Heavy Bend</option>
+							<option value="Special Bend">Special Bend</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<!-- HANDLE DEFAULTS -->
+					<span ng-init="standard.multiplier=1"></span>
+
+					<div class="gridHead" data-tooltip="How many times will this configuration be re-used">Multiplier <i class="fa fa-question-circle"></i></div>
+					<div class="gridContent">
+						<input type="text" class="quantityText" ng-model="standard.multiplier">
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<!-- HANDLE DEFAULTS -->
+					<span ng-init="standard.multiplier2=1"></span>
+
+					<div class="gridHead">2nd Multiplier</div>
+					<div class="gridContent">
+						<input type="text" class="quantityText" ng-model="standard.multiplier2">
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<!-- HANDLE DEFAULTS -->
+					<span ng-init="standard.size=estimate.size"></span>
+					
+					<div class="gridHead">Size</div>
+					<div class="gridContent">
+						<select ng-model="standard.size">
+							<option ng-repeat="i in [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]" value="{{i}}">
+								{{i}}
+							</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<div class="gridHead">Quantity</div>
+					<div class="gridContent">
+						<!-- <span ng-if="standard.quantity==undefined" ng-init="standard.quantity=1;"></span> -->
+						<input type="text" placeholder="0" class="quantityText" id="startPointStandard" ng-model="standard.quantity">
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<div class="gridHead">Length</div>
+					<div class="gridContent noWrap">
+						<input type="text" placeholder="ft" class="weightInput" ng-model="standard.toollength" > ft &nbsp;&nbsp;
+						<input type="text" placeholder="in" class="weightInput" ng-model="standard.toollengthinches"> in
+					</div>
+				</div>
+
+
+				<div class="gridItem">
+					<!-- DEFAULTS -->
+					<span ng-init="standard.waste = estimate.waste"></span>
+
+					<div class="gridHead">Waste</div>
+					<div class="gridContent">
+						<input type="text" class="weightInput" placeholder="0" ng-model="standard.waste">%
+					</div>
+				</div>
+
+				<div class="gridItem">
+					<div class="gridHead">Notes</div>
+					<div class="gridContent">
+						<textarea ng-model="standard.notes"></textarea>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</div>	
+
+	<div class="editGrid">
+		<div class="gridItem">
+			<div class="gridHead">&nbsp;</div>
+			<div class="gridContent" ng-if="standard.quantity > 0">
+			<input type="submit" class="button success" ng-click="addItem(standard);" ng-disabled="standard.groupID == 'new group' && !group.title && standard.quantity > 0" value="Add">
+				<span ng-if="standard.groupID=='new group' && !group.title">Please Specifiy a Group</span>
+			</div>
+		</div>
+	</div>
+
+</section>
+</form>
+
+<!-- ITEM CALCULATION ASSISTANT -->
+<a class="button" ng-click="setItemCalculationAssistant(true)"><i class="fa fa-cog"></i> Item Calculation Assitant</a>
+
+<a class="button warning" ng-click="setItemCalculationAssistant(false)" ng-show="userObject[0].calculationAssistant">Close</a>
+
+<section class="flexibleTable smallFlexibleTable" ng-show="userObject[0].calculationAssistant">
+	<div class="row greyBG">
+
+		<div class="editGrids">
+			<div class="editGrid">
+
+				<div class="gridItem">
+
+					<div class="gridHead">Span</div>
+					<div class="gridContent">
+						<input type="text" placeholder="ft" class="weightInput" ng-model="assistant.span"  ng-change="calculateQuantity()"> ft &nbsp;&nbsp;
+						<input type="text" placeholder="in" class="weightInput" ng-model="assistant.spanIN"  ng-change="calculateQuantity()"> in
+					</div>
+
+				</div>
+
+				<div class="gridItem">
+
+					<div class="gridHead">Spacing</div>
+					<div class="gridContent">
+						<input type="text" placeholder="ft" class="weightInput" ng-model="assistant.spacing"  ng-change="calculateQuantity()"> ft &nbsp;&nbsp;
+						<input type="text" placeholder="in" class="weightInput" ng-model="assistant.spacingIN"  ng-change="calculateQuantity()"> in
+					</div>
+
+				</div>
+
+				<div class="gridItem">
+
+					<div class="gridHead"># of Bends</div>
+					<div class="gridContent">
+						<span>#</span>
+						<input type="text" class="weightInput" ng-model="assistant.bendsCount" ng-change="calculateLength()">
+					</div>
+
+				</div>
+
+				<div class="gridItem">
+
+					<div class="gridHead">Bends</div>
+					<div class="gridContent">
+						<div class="bends" ng-show="assistant.bendsCount > 0">
+							<div ng-repeat="bend in assistant.bends | limitTo: assistant.bendsCount track by $index" class="bendsInput">
+								<div class="input-group">
+									<div class="inputGroupLabel">#{{$index+1}}</div>
+									<input type="text" placeholder="ft" ng-change="calculateLength()" ng-model="bend.ft"> ft
+									<input type="text" placeholder="in" ng-change="calculateLength()"  ng-model="bend.in"> in
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+</section>
+
+<!-- <table class="hover" style="width: 100%;" ng-show="userObject[0].calculationAssistant">
+	<thead>
+		<th>Span</th>
+		<th>Spacing</th>
+		<th># of Bends</th>
+		<th ng-show="assistant.bendsCount > 0">Bends</th>
+	</thead>
+	<tbody>
+		<td>
+			<input type="text" placeholder="ft" class="weightInput" ng-model="assistant.span"  ng-change="calculateQuantity()"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="in" class="weightInput" ng-model="assistant.spanIN"  ng-change="calculateQuantity()"> in
+		</td>
+		<td>
+			<input type="text" placeholder="ft" class="weightInput" ng-model="assistant.spacing"  ng-change="calculateQuantity()"> ft &nbsp;&nbsp;
+			<input type="text" placeholder="in" class="weightInput" ng-model="assistant.spacingIN"  ng-change="calculateQuantity()"> in
+		</td>
+		<td>
+			<div class="input-group">
+				<span class="input-group-label">#</span>
+				<input type="text" ng-model="assistant.bendsCount" ng-change="calculateLength()">
+			</div>
+		</td>
+		<td>
+			<div class="bends" ng-show="assistant.bendsCount > 0">
+				<div ng-repeat="bend in assistant.bends | limitTo: assistant.bendsCount track by $index" class="bendsInput">
+					<div class="input-group">
+						<div class="inputGroupLabel">#{{$index+1}}</div>
+						<input type="text" placeholder="ft" ng-change="calculateLength()" ng-model="bend.ft"> ft
+						<input type="text" placeholder="in" ng-change="calculateLength()"  ng-model="bend.in"> in
+					</div>
+				</div>
+			</div>
+		</td>
+	</tbody>
+</table> -->

@@ -1,0 +1,32 @@
+FEET & INCHES:
+<div class="gridItem" ng-show="column.vertType.indexOf('Lap Length') > -1">
+	<div class="gridHead">Stock Length</div>
+	<input type="text" placeholder="0" class="weightInput" ng-model="column.stocklength"> ft &nbsp;&nbsp;
+	<input type="text" placeholder="0" class="weightInput" ng-model="column.stocklengthinches"> in
+</div>
+
+QUANTITY:
+<div class="gridItem">
+	<div class="gridHead">Quantity</div>
+	<div class="gridContent">
+		<input type="text" placeholder="0" class="quantityInput" ng-model="beam.bottomBar.quantity">
+	</div>
+</div>
+
+SELECT BOX:
+<div class="gridItem">
+	<div class="gridHead">NAME</div>
+	<div class="gridContent">
+		<select ng-model="MODEL">
+			<option value="OPTIONS">OPTIONS</option>
+		</select>
+	</div>
+</div>
+
+INPUT TEXT:
+<div class="gridItem">
+	<div class="gridHead">NAME</div>
+	<div class="gridContent">
+		<input type="text" ng-model="MODEL">
+	</div>
+</div>

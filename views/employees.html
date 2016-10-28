@@ -1,0 +1,233 @@
+<div class="singlePane">
+
+	<ul class="breadcrumbs">
+		<li><a ui-sref="/">Home</a></li>
+		<li>HR (Employees)</li>
+	</ul>
+
+	<h3 class="contentPaneTitle">HR (Employee Management)</h3>
+
+	<label>
+		<b>COMPANY / DIVISION</b>
+		<select ng-model="user.companyBrowsing" ng-change="setCompanyBrowsing(user.companyBrowsing)" class="largeText">
+			<option value="{{company.$id}}" ng-repeat="company in companies" ng-if="adminOfCompany(company.$id)">{{company.name}}</option>
+		</select>
+	</label>
+
+	<div class="addEmployee">
+		<b>ADD EMPLOYEE</b>
+		<section class="flexibleTable">
+			<div class="tableRow">
+				<div class="tableCell">
+					<div class="tableCellContent">
+						<b>FIRST NAME</b>
+						<input type="text" ng-model="employee.name">
+					</div>
+				</div>
+				<div class="tableCell">
+					<div class="tableCellContent">
+						<b>LAST NAME</b>
+						<input type="text" ng-model="employee.lastName">
+					</div>
+				</div>
+			</div>
+			<a ng-click="addEmployee()" class="button expanded large">Add Employee</a>
+	</div>
+
+	<br>
+
+	<div class="tableGroup">
+
+		<ul class="tabs" data-tabs id="employeeTabs">
+		  <li class="tabs-title"><a ng-click="setEmployeeTab('hoursPay')"  ng-class="{active:user.employeeTab=='hoursPay'}"><i class="fa fa-usd"></i> Payment Reports</a></li>
+		  <li class="tabs-title is-active"><a ng-click="setEmployeeTab('management');" ng-class="{active:user.employeeTab=='management'}"><i class="fa fa-cogs"></i> Manage Employees</a></li>
+		</ul>
+
+<div class="tabs-content" data-tabs-content="employeeTabs">
+		<div class="tabs-panel is-active" ng-show="user.employeeTab == 'hoursPay' || !user.employeeTab">
+			<input type="text" ng-model="filter" placeholder="Search"><br>
+
+			<div class="dateRange" daterange>
+		  		<b>DATE RANGE:</b>
+		  		<div id="daterange"></div>
+		  		<input type="text" class="dateRangePicker">
+		  	</div>
+
+		  	<h4 ng-show="dateRange" class="text-center">Showing Payment Reports for: 
+		  		<select ng-model="user.companyBrowsing" ng-change="setCompanyBrowsing(user.companyBrowsing)" class="inlineSelect">
+					<option value="{{company.$id}}" ng-repeat="company in companies" ng-if="adminOfCompany(company.$id)">{{company.name}}</option>
+				</select>
+			</h4>
+
+		    <section class="flexibleTable" ng-show="dateRange">
+		    	<div class="tableRow" ng-repeat="employee in employees | orderBy:'lastName' | filter:filter" ng-show="isInCompany(employee.$id, user.companyBrowsing)">
+		    		<div class="tableCell">
+		    			<div class="tableHead">Name</div>
+		    			<div class="tableCellContent">
+		    				{{employee.lastName}}, {{employee.name}}
+		    				<a ng-click="editEmployee=employee.$id"><i class="fa fa-pencil-square-o"></i></a>
+		    				<div ng-show="editEmployee==employee.$id" class="editName">
+		    					<input type="text" ng-model="employee.lastName" ng-change="employees.$save(employee)">, 
+		    					<input type="text" ng-model="employee.name" ng-change="employees.$save(employee)">
+		    					<button ng-click="editEmployee=false" class="button small">Done</button>
+		    				</div>
+		    			</div>
+		    		</div>
+		    		<div class="tableCell">
+		    			<div class="tableHead">Jobs</div>
+		    			<div class="tableCellContent">
+		    				<a ng-click="showJobs = true" ng-show="!showJobs" class="button small">Show</a>
+		    				<div ng-show="showJobs">
+		    					<a ng-click="showJobs = false" class="button small">Hide</a>
+								<div ng-repeat="estimate in estimates | orderBy:'priority'" ng-if="employeeHasJob(estimate.$id, employee.$id) && jobInCompany(estimate.$id, user.companyBrowsing)" class="paymentJob">
+									<b>{{estimate.name}}</b> - {{getCompanyName(estimate.companyID)}}<br>
+
+									Hours: {{employeeHoursInJob(estimate.$id, employee.$id, dateRange)}}<br>
+									Rate: {{employeeRateInJob(estimate.$id, employee.$id) | currency}} / hr<br>
+									Gross Pay: {{employeeHoursInJob(estimate.$id, employee.$id, dateRange) * employeeRateInJob(estimate.$id, employee.$id) | currency}}
+								</div>
+							</div>
+		    			</div>
+		    		</div>
+		    		<div class="tableCell">
+		    			<div class="tableHead">Total Gross Pay</div>
+		    			<div class="tableCellContent">
+		    				{{totalGrossPayInPeriod(employee.$id, user.companyBrowsing, dateRange) | currency}}
+		    			</div>
+		    		</div>
+		    		<div class="tableCell">
+		    			<div class="tableHead">Total Weight</div>
+		    			<div class="tableCellContent">
+		    				<!-- {{totalPoundsEmployee(employee.$id, user.companyBrowsing, dateRange) | number:2}} lbs -->
+		    			</div>
+		    		</div>
+		    		<div class="tableCell">
+		    			<div class="tableHead">Total Hours</div>
+		    			<div class="tableCellContent">
+		    				{{totalHours(employee.$id, user.companyBrowsing, dateRange) | number:2}} hrs
+		    			</div>
+		    		</div>
+		    		<div class="tableCell">
+		    			<div class="tableHead">Pounds / Hour</div>
+		    			<div class="tableCellContent">
+		    				<!-- {{totalPoundsEmployee(employee.$id, user.companyBrowsing, dateRange) / totalHours(employee.$id, user.companyBrowsing, dateRange) || 0 | number:2}} lbs / hour -->
+		    			</div>
+		    		</div>
+		    	</div>
+		    </section>
+	    </div>
+  <div class="tabs-panel is-active" id="management" ng-show="user.employeeTab == 'management'">
+
+  		  	<h4 class="text-center">Showing Employees assigned to: 
+  		  		<select ng-model="user.companyBrowsing" ng-change="setCompanyBrowsing(user.companyBrowsing)" class="inlineSelect">
+  					<option value="{{company.$id}}" ng-repeat="company in companies" ng-if="adminOfCompany(company.$id)">{{company.name}}</option>
+  				</select>
+  			</h4>
+
+  		<input type="text" ng-model="filter" placeholder="Search"><br>
+
+		<section class="flexibleTable">
+			<div class="tableRow" ng-repeat="employee in employees | orderBy:'lastName' | filter:filter" ng-if="isInCompany(employee.$id, user.companyBrowsing)">
+				<div class="tableCell">
+					<div class="tableHead">Name</div>
+					<div class="tableCellContent">
+						{{employee.lastName}}, {{employee.name}}
+						<a ng-click="editEmployee=employee.$id"><i class="fa fa-pencil-square-o"></i></a>
+						<div ng-show="editEmployee==employee.$id" class="editName">
+							<input type="text" ng-model="employee.lastName" ng-change="employees.$save(employee)">, 
+							<input type="text" ng-model="employee.name" ng-change="employees.$save(employee)">
+							<button ng-click="editEmployee=false" class="button small">Done</button>
+						</div>
+					</div>
+				</div>
+				<div class="tableCell">
+		    			<div class="tableHead">Companies / Divisions</div>
+		    			<div class="tableCellContent">
+		    				<a ng-click="showCompanies = true" ng-show="!showCompanies" class="button small">Show</a>
+		    				<div ng-show="showCompanies">
+		    					<a ng-click="showCompanies = false" class="button small">Hide</a>
+								<div  ng-repeat="company in companies" ng-if="adminOfCompany(company.$id)" class="companyAssignment">
+									<input type="checkbox" ng-checked="isInCompany(employee.$id, company.$id)" ng-click="setEmployeeCompany(employee.$id, company.$id)"> {{company.name}}
+								</div>
+							</div>
+		    			</div>
+		    		</div>
+				<div class="tableCell">
+					<div class="tableHead">Jobs</div>
+					<div class="tableCellContent">
+						<a ng-click="showTheJobs=true" ng-show="!showTheJobs" class="button small">Show</a>
+						<div class="employeeJobs" ng-show="showTheJobs">
+							<a ng-click="showTheJobs=false" class="button small">Hide</a><br>
+							<div ng-repeat="estimate in estimates | orderBy:'priority'" ng-show="isInCompany(employee.$id, estimate.companyID)" class="companyAssignment">
+								<input type="checkbox" ng-checked="isInJob(employee.$id, estimate.$id)" ng-click="setEmployeeJob(employee.$id, estimate.$id)"> {{estimate.name}} <small>{{getCompanyName(estimate.companyID)}}</small>
+								<div ng-show="isInJob(employee.$id, estimate.$id)">
+									<label><b>Rate</b></label>
+									<div class="input-group">
+										<span class="input-group-label">
+											$
+										</span>
+										 <input type="text" placeholder="0.00" ng-model="rate" ng-value="getJobRate(employee.$id, estimate.$id)" ng-change="setJobRate(employee.$id, estimate.$id, rate)">
+										<span class="input-group-label">
+											/hr
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- <div class="tableCell">
+					<div class="tableHead">Default Rate</div>
+					<div class="tableCellContent">
+						<div class="input-group smallGroup">
+							<span class="input-group-label">$</span>
+								<input type="text" ng-model="employee.defaultRate" ng-change="employees.$save(employee)">
+							<span class="input-group-label">/hr</span>
+						</div>
+					</div>
+				</div> -->
+				<!-- <div class="tableCell">
+					<div class="tableHead">Manage Jobs</div>
+					<div class="tableCellContent">
+						<select ng-model="assignJob">
+							<option value="{{estimate.$id}}" ng-repeat="estimate in estimates | orderBy:'priority'">
+								{{estimate.name}}
+							</option>
+						</select>
+						
+						<div ng-repeat="rate in rates" ng-show="assignJob && rate.estimateID == assignJob && rate.employeeID == employee.$id">
+							<b>Assigned To Job</b><br>
+							<b><small>RATE</small></b>
+							<div class="input-group">
+								<span class="input-group-label">$</span>
+								<input type="text" ng-model="rate.rate" ng-change="rates.$save(rate)" ng-show="rate.estimateID == assignJob">
+								<span class="input-group-label">/hr</span>
+							</div>
+							<a class="button small success">Save</a> <a ng-click="rates.$remove(rate)" class="button small warning">Unset Rate</a>
+						</div>
+						<div ng-show="assignJob && hasNoValidRates(assignJob, employee.$id)">
+							<b>SET JOB RATE FOR EMPLOYEE</b>
+							<div class="input-group">
+								<span class="input-group-label">$</span>
+								<input type="text" ng-model="newRate">
+								<span class="input-group-label">/hr</span>
+							</div>
+							<a ng-click="addRate(assignJob, employee.$id, newRate)" class="button small sucess">Set Rate &amp; Assign To Job</a>
+						</div>
+					</div>
+				</div> -->
+				<div class="tableCell">
+					<div class="tableHead">Deactivate</div>
+					<div class="tableCellContent">
+						<a ng-click="employees.$remove(employee)" class="button warning">Deactivate</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+	
+</div>
+	</div>
+
+
+</div>

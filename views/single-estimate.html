@@ -1,0 +1,93 @@
+<div class="singlePane">
+
+	<ul class="breadcrumbs">
+		<li><a ui-sref="/">Home</a></li>
+		<li><a ui-sref="estimates">Estimates</a></li>
+		<li>{{estimate.name}}</li>
+	</ul>
+
+	<h3 class="contentPaneTitle">{{estimate.name || 'Untitled'}} <a href="#edit/{{estimate.$id}}" class="button">Edit</a></h3>
+
+	<div class="jobListingNumber">
+		Bid Date: {{estimate.date}} &middot; Estimate: #{{estimate.number}}
+	</div>
+
+	<div class="jobListingMeta">
+		<div class="jobListingMetaItem">
+			<b>ESTIMATOR</b>
+			{{estimate.estimator || 'Not Set'}}
+		</div>
+		<div class="jobListingMetaItem">
+			<b>Sales Person</b>
+			{{estimate.salesPerson || 'Not Set'}}
+		</div>
+		<div class="jobListingMetaItem">
+			<b>Pricing Person</b>
+			{{estimate.pricingPerson || 'Not Set'}}
+		</div>
+	</div>
+
+	<br>
+	<b>COSTING DETAILS</b>
+	<div class="jobListingMeta">
+		<div class="jobListingMetaItem">
+			<b>Material <small>Cost</small></b>
+			${{estimate.materialCost || 'Not Set'}} / lb
+		</div>
+		<div class="jobListingMetaItem">
+			<b>Fabrication <small>Cost</small></b>
+			${{estimate.fabricationCost || 'Not Set'}} / lb
+		</div>
+		<div class="jobListingMetaItem">
+			<b>Markup <small></small></b>
+			{{estimate.markupCost || 'Not Set'}}%
+		</div>
+	</div>
+	<br>
+
+	<h4 class="subContentPaneTitle">ITEMS IN JOB</h4>
+
+	<!-- <input type="text" placeholder="Filter..." class="contentPaneSearch"> -->
+
+	<div class="jobListing">
+		<ul class="groupListings">
+			<li class="group" ng-repeat="group in groups | orderBy: 'priority'" groupid="{{group.$id}}">
+				<div class="groupTitle" groupid="{{group.$id}}" ng-click="expandGroup(group.$id)">
+					<div class="groupTitleHeader">
+						{{group.title}} 
+						<div style="height: 1px;"></div>
+						<small>WEIGHT: <b>{{itemsTotalWeight(estimate.$id, group.$id) | number:2}} lbs</b>
+						 COST: <b>{{itemsTotalCost(estimate.$id, estimate, group.$id) | currency}}</b></small>
+					</div>
+				</div>
+
+			<section class="flexibleTable smallFlexibleTable" sortablejs>
+				<ul class="sortableItems">
+					<li class="sortableItem tableRow" ng-repeat="item in items | orderBy:'priority'" ng-if="item.groupID == group.$id">
+						<div class="row">
+							<viewitemtable></viewitemtable>
+						</div>
+					</li>
+				</ul>
+			</section>
+	</li>
+</ul>
+
+<table class="grandTotal">
+	<tbody>
+		<tr>
+			<td class="grandTotalLabel">
+				Grand Total:
+			</td>
+			<td class="grandTotalWeight">
+				{{itemsTotalWeight(estimate.$id, 'all') | number:2}}lbs
+			</td>
+			<td class="grandTotalCost">
+				{{itemsTotalCost(estimate.$id, estimate, 'all') | currency}}
+			</td>
+		</tr>
+	</tbody>
+</table>
+		<br>
+	</div>
+</div>

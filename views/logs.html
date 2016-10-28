@@ -1,0 +1,27 @@
+<div class="singlePane">
+	<h3 class="contentPaneTitle">ESTIMATES</h3>
+	<div class="input-group">
+		<span class="input-group-label"><i class="fa fa-search"></i></span>
+		<input type="text" placeholder="Search..." class="contentPaneSearch" ng-model="filter">
+	</div>
+
+<ul class="sortableJobs" sortablejs>
+	<li class="jobListing" estimateid="{{estimate.$id}}" ng-repeat="estimate in estimates | orderBy:'priority' | filter:filter">
+		<!-- <small><pre>{{estimate}}</pre></small> -->
+		<div class="jobListingHeader">
+			<div class="jobListingTitle">
+				<b>{{estimate.name || 'Untitled'}}</b>
+			</div>
+		</div>
+		<div class="jobListingNumber">
+			Bid Date: {{estimate.date}} &middot; Estimate: #{{estimate.number}}
+		</div>
+
+		<a href="#daily-log/{{estimate.$id}}" class="button alert">Daily Log</a>
+		<a href="#progress/{{estimate.$id}}" class="button">Job Report</a>
+
+		</div>
+	</li>
+</ul>
+
+</div>

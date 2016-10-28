@@ -1,0 +1,169 @@
+<div class="editGrid smallFlexibleTable">
+
+	<div class="gridItem">
+		<div class="gridHead">Total Sheets</div>
+		<div class="gridContent">
+			{{item.totalSheets | number:2}}
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Weight</div>
+		<div class="gridContent">
+			{{item.totalWeight | number:2}}lbs
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">Multiplier</div>
+		<div class="gridContent">
+			{{item.multiplier}}
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET -->
+
+		<div class="gridHead">2nd Multiplier</div>
+		<div class="gridContent">
+			{{item.multiplier2}}
+		</div>
+	</div>	
+
+	<div class="gridItem">
+		<!-- RESET DEFAULT -->
+
+		<div class="gridHead">Length (area)</div>
+		<div class="gridContent noWrap">
+			{{item.lengthFT}} ft &nbsp;&nbsp;
+			{{item.lengthIN}} in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Width (area)</div>
+		<div class="gridContent noWrap">
+			{{item.widthFT}} ft &nbsp;&nbsp;
+			{{item.widthIN}} in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- RESET DEFAULT -->
+
+		<div class="gridHead">Length (sheet)</div>
+		<div class="gridContent noWrap">
+			{{item.lengthSheetFT}} ft &nbsp;&nbsp;
+			{{item.lengthSheetIN}} in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Width (sheet)</div>
+		<div class="gridContent noWrap">
+			{{item.widthSheetFT}} ft &nbsp;&nbsp;
+			{{item.widthSheetIN}} in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+
+		<div class="gridHead">Lap <small>(length)</small></div>
+		<div class="gridContent noWrap">
+			{{item.laplength}} in
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<!-- JOB DEFAULT -->
+		<div class="gridHead">Waste</div>
+		<div class="gridContent">
+			{{item.waste}}%
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Mesh Size</div>
+		<div class="gridContent noWrap">
+			{{item.size}}
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Sheets / Man Hour</div>
+		<div class="gridContent">
+			{{item.sheetsPerManHour}}
+		</div>
+	</div>
+
+	<div class="gridItem">
+		<div class="gridHead">Cost / Sheet</div>
+		<div class="gridContent">
+			{{item.costPerSheet}}
+		</div>
+	</div>
+
+	<div class="editGrid flexEnd">
+		<div class="gridItem">
+			<div class="gridHead">Weight</div>
+			<div class="gridContent">
+				<span ng-init="item.weight=item.totalWeight; items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative" ng-init="item.weight = item.weight * (-1); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative">
+					<span ng-init="itemGroup.weight=item.weight+itemGroup.weight; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.totalWeight=item.weight+group.totalWeight; groups.$save(group)"></span>
+					<span ng-init="estimate.totalWeight=item.weight+estimate.totalWeight; estimates.$save(estimate)"></span>
+				</span>
+				<span ng-if="!itemGroup.itemsNegative">
+					<span ng-init="itemGroup.weight=item.weight+itemGroup.weight; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.totalWeight=item.weight+group.totalWeight; groups.$save(group)"></span>
+					<span ng-init="estimate.totalWeight=item.weight+estimate.totalWeight; estimates.$save(estimate)"></span>
+				</span>
+				{{item.weight | number:2}} lbs
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Material Cost</div>
+			<div class="gridContent">
+				<span ng-init="item.cost=meshMaterialCost(item); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative" ng-init="item.cost = item.cost * (-1); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative">
+					<span ng-init="itemGroup.materialCost=item.cost+itemGroup.materialCost; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.materialCost=item.cost+group.materialCost; groups.$save(group)"></span>
+					<span ng-init="estimate.totalMaterialCost=item.cost+estimate.totalMaterialCost; estimates.$save(estimate)"></span>
+				</span>
+				<span ng-if="!itemGroup.itemsNegative">
+					<span ng-init="itemGroup.materialCost=item.cost+itemGroup.materialCost; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.materialCost=item.cost+group.materialCost; groups.$save(group)"></span>
+					<span ng-init="estimate.totalMaterialCost=item.cost+estimate.totalMaterialCost; estimates.$save(estimate)"></span>
+				</span>
+				{{item.cost | currency}}
+			</div>
+		</div>
+
+		<div class="gridItem">
+			<div class="gridHead">Labor Cost</div>
+			<div class="gridContent">
+				<span ng-init="item.laborCost=meshLaborCost(item, estimate, employeeGroup.costPerWorkingHour); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative" ng-init="item.laborCost = item.laborCost * (-1); items.$save(item);"></span>
+				<span ng-if="itemGroup.itemsNegative">
+					<span ng-init="itemGroup.laborCost=item.laborCost+itemGroup.laborCost; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.laborCost=item.laborCost+group.laborCost; groups.$save(group)"></span>
+					<span ng-init="estimate.laborCost=item.laborCost+estimate.laborCost; estimates.$save(estimate)"></span>
+				</span>
+				<span ng-if="!itemGroup.itemsNegative">
+					<span ng-init="itemGroup.laborCost=item.laborCost+itemGroup.laborCost; itemGroups.$save(itemGroup)"></span>
+					<span ng-init="group.laborCost=item.laborCost+group.laborCost; groups.$save(group)"></span>
+					<span ng-init="estimate.laborCost=item.laborCost+estimate.laborCost; estimates.$save(estimate)"></span>
+				</span>
+				{{item.laborCost | currency}}
+			</div>
+		</div>
+
+	</div>
+
+</div>

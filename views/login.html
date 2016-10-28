@@ -1,0 +1,171 @@
+<div class="singlePane">
+	<ul class="breadcrumbs">
+		<li><a ui-sref="/">Home</a></li>
+		<li>Login / Register</li>
+	</ul>
+
+	<div class="authenticationTabs" ng-show="!firebaseUser">
+		<a class="button" ng-click="tab='register'" ng-class="{'active':tab=='register' || !tab}">Register <br><small>a new account</small></a>
+		<a class="button" ng-click="tab='login'"  ng-class="{'active':tab=='login'}">Login <br><small>existing account</small></a>
+	</div>
+
+	<div class="authenticationBox">
+
+		<div ng-show="!firebaseUser">
+
+			<div ng-show="tab=='register' || !tab">
+				<h1>Sign Up</h1>
+				<form  method="POST" id="payment-form">
+					<label>
+						<b>Name</b>
+						<input type="text" placeholder="Name" ng-model="newUser.name" required>
+					</label>
+					<label>
+						<b>Company Name</b>
+						<input type="text" placeholder="Company Name" ng-model="newUser.companyName" required>
+					</label>
+					<label>
+						<b>Email Address</b>
+						<input type="email" placeholder="Email" ng-model="newUser.email" required>
+					</label>
+					<label>
+						<b>Password</b>
+						<input type="password" placeholder="Password" ng-model="newUser.password" required>
+					</label>
+
+					<label>
+						<b>Test User?</b>
+						<input type="checkbox" ng-model="newUser.test">
+					</label>
+
+					<div class="planSelection highlightArea">
+						<b class="panelHeader"><i class="fa fa-calendar-o" aria-hidden="true"></i> Select Plan</b>
+
+						<span ng-init="newUser.plan='monthly'"></span>
+						<div class="highlightArea planOptions">
+							<label class="clickable">
+								Monthly Subscription<br> <small>$49 / month</small>
+								<input type="radio" ng-model="newUser.plan" value="monthly">
+							</label>
+							<label class="clickable">
+								Yearly Subscription<br> <small>$39 / month</small>
+								<input type="radio" ng-model="newUser.plan" value="yearly">
+							</label>
+						</div>
+
+					</div>
+
+				    <div class="clear" style="height: 20px;"></div>
+
+				    <div class="creditCardForm highlightArea">
+				    	<b class="panelHeader"><i class="fa fa-credit-card" aria-hidden="true"></i> Billing Information</b>
+
+				    	<div class="row-3">
+				  			<label for="nameOnCard">
+				  				Name on Card
+					  			<input type="text" data-stripe="name" value="" placeholder="Name on Credit Card" name="nameOnCard" id="nameOnCard">
+					  		</label>
+					  	</div>
+
+					  	<div class="row-1"></div>
+
+					  	<div class="row-2">
+				  			<label for="cardNumber">
+				  				Card Number
+					  			<input type="text" data-stripe="number" value="" placeholder="Card Number" name="cardNumber" id="cardNumber">
+					  		</label>
+					  	</div>
+
+					  	<div class="row-1"></div>
+
+					  	<label style="margin: 0;">Expiration Date</label>
+
+					  	<div class="row-4">
+				  			<label for="expDateMonth">
+				  				<small>Month</small>
+					  			<select data-stripe="exp-month" name="expDateMonth" id="expDateMonth">
+									<option value="01">01</option>
+									<option value="02">02</option>
+									<option value="03">03</option>
+									<option value="04">04</option>
+									<option value="05">05</option>
+									<option value="06">06</option>
+									<option value="07">07</option>
+									<option value="08">08</option>
+									<option value="09">09</option>
+									<option value="10">10</option>
+									<option value="11">11</option>
+									<option value="12">12</option>
+								</select>
+							</label>
+						</div>
+						<div class="row-4">
+				  			<label for="expDateYear">
+				  				<small>Year</small>
+					  			<select data-stripe="exp-year" name="expDateYear" id="expDateYear">
+									<option selected="" value="2016">2016</option>
+									<option value="2017">2017</option>
+									<option value="2018">2018</option>
+									<option value="2019">2019</option>
+									<option value="2020">2020</option>
+									<option value="2021">2021</option>
+									<option value="2022">2022</option>
+									<option value="2023">2023</option>
+									<option value="2024">2024</option>
+									<option value="2025">2025</option>
+									<option value="2026">2026</option>
+								</select>
+							</label>
+						</div>
+						<div class="row-1"></div>
+						<div class="row-4">
+				  			<label for="cvcCode">
+				  				Security Code
+					  			<input type="text" data-stripe="cvc" value="" placeholder="xxxx" name="cvcCode" id="cvcCode">
+					  			<small>3-4 digit # on back of card</small>
+								<!-- <span class="formHelp"><a tabindex="-100" href="#_">What is this?</a></span> -->
+							</label>
+						</div>
+			  		</div>
+
+					<input type="submit" class="button large success" ng-click="registerUser(newUser)" value="Register"></input>
+					<br>
+					<small>By clicking the "Register" button above you agree to our <a ng-click="$root.showTerms=true">Terms of Service</a>
+
+					<div class="modalWindow" ng-show="$root.showTerms">
+					    <div class="modalWindowInner">
+					        <h1>Terms of Service</h1>
+					        <a class="button modalCloseButton" ng-click="$root.showTerms = false; users.$save(user);">Close</a>
+					        
+					        <termsofservice></termsofservice>
+					    </div>
+					</div>
+
+				</form>
+			</div>
+			<div ng-show="tab=='login'">
+				<h1>Login</h1>
+				<form>
+					<label>
+						<b>Email Address</b>
+						<input type="email" placeholder="Email" ng-model="user.email">
+					</label>
+					<label ng-show="!forgotPassword">
+						<b>Password</b>
+						<input type="password" placeholder="Password" ng-model="user.password">
+					</label>
+					<a ng-click="forgotPassword = true;">Forgot Password?</a><br>
+					<input type="submit" class="button large success" ng-click="loginUser()" value="Login"></input>
+				</form>
+			</div>
+		</div>
+
+		<div ng-show="firebaseUser">
+			Login successful
+			<p align="center">
+				<a href="#/add" class="button">Add Estimate</a>
+				<a href="#/estimates" class="button">View Estimates</a>
+			</p>
+		</div>
+	</div>
+</div>

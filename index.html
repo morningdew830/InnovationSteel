@@ -1,0 +1,102 @@
+<!doctype html>
+<html class="no-js" lang="en" ng-app="steel">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Innovation Steel</title>
+    <link rel="stylesheet" href="css/foundation.css" />
+    <link rel="stylesheet" href="css/app.css" />
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-animate.min.js"></script>
+
+    <script src="https://cdn.firebase.com/js/client/2.2.2/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script>
+
+    <script type="text/javascript" src="js/html2canvas.js"></script>
+    <script src="js/FileSaver.js"></script>
+    <script src="js/jspdf.js"></script>
+    <script src="js/addimage.js"></script>
+
+    <!-- STRIPE -->
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <script type="text/javascript">
+      Stripe.setPublishableKey('pk_test_rjafTSucNvPvzCEGoT2oxD70');
+    </script>
+
+  </head>
+  <body ng-controller="main">
+
+    <div class="flashMessage" ng-if="$root.message" style="top:{{mouseY}}; left:{{mouseX}}; width:{{flashMessageWidth || 'auto'}}; font-size:{{flashMessageSize || '15'}}px; text-align: center;">{{$root.message}}</div>
+
+    <section class="bodyLoader" ng-show="!contentLoaded">
+        <div>
+            <img src="http://res.cloudinary.com/dsgmrzsui/image/upload/c_scale,w_250/v1461770316/loading-wheel_rcf1pb.gif">
+            <div class="text-center">LOADING... Please Wait</div>
+        </div>
+    </section>
+
+  	<section class="appContainer">
+
+	    <section class="leftPane" ng-show="!hideSidebar">
+	    	<div class="leftPaneLogo">
+	    		<a ui-sref="/"><img src="images/logo.png"></a>
+	    	</div>
+	    	<div class="leftPaneMenu">
+	    		<ul>
+	    			<li><a ui-sref="estimates" ng-class="{active:$state.includes('estimates') || $state.includes('view') || $state.includes('edit')}"><i class="fa fa-table"></i> Estimates</a></li>
+                    <li><a ui-sref="add" ng-class="{active:$state.includes('add')}"><i class="fa fa-plus-square"></i> New Estimate</a></li>
+                    <!-- <li><a ui-sref="employees" ng-class="{active:$state.includes('employees')}"><i class="fa fa-users"></i> HR (Employees)</a></li> -->
+                    <li><a ui-sref="labor" ng-class="{active:$state.includes('labor')}"><i class="fa fa-users"></i> Labor</a></li>
+                    <li ng-show="!firebaseUser"><a ui-sref="login" ng-class="{active:$state.includes('login')}"><i class="fa fa-users"></i> Register / Login</a></li>
+	    			<li ng-show="firebaseUser"><a ui-sref="settings" ng-class="{active:$state.includes('settings')}"><i class="fa fa-users"></i> Settings</a></li>
+                    <li ng-show="firebaseUser"><a ng-click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
+	    			<!-- <li><a ui-sref="add" ui-sref-active="active"><i class="fa fa-cogs"></i> Item Builder</a></li> -->
+	    		</ul>
+	    	</div>
+	    </section>
+
+	    <section class="contentPane" ng-if="firebaseUser">
+            <div>
+    	    	<ui-view></ui-view>
+            </div>
+
+	    </section>
+
+        <section class="contentPane" ng-if="!firebaseUser">
+            <login ng-init="contentLoaded=true" ng-if="!hideSidebar"></login>
+            <div ng-show="firebaseUser || hideSidebar">
+                <ui-view></ui-view>
+            </div>
+        </section>
+
+	</section>
+
+	<!-- {{test}} -->
+
+    <script src="js/vendor/jquery.min.js"></script>
+    <script src="js/vendor/what-input.min.js"></script>
+    <script src="js/foundation.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/ng-Pagination/simplePagination.js"></script>
+    <script src="js/directives.js"></script>
+    <script src="js/scripts.js"></script>
+    <script type="text/javascript" src="js/states.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script type="text/javascript" src="js/moment.min.js"></script>
+    <script type="text/javascript" src="js/jquery.comiseo.daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="js/jquery.comiseo.daterangepicker.css">
+    <link rel="stylesheet" type="text/css" href="js/jquery-ui.min.css">
+    <script type="text/javascript" src="js/angular-selector.js"></script>
+    <link rel="stylesheet" type="text/css" href="js/angular-selector.css">
+  </body>
+</html>

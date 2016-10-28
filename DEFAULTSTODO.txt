@@ -1,0 +1,47 @@
+User Wide Defaults (Initial & Customizable)
+Job Defaults (Initial & Customizable)
+Persistant Defaults
+
+DEFAULT SETTINGS & BEHAVIOR
+Group / Area - PD
+Difficulty - 1
+SAC Group - PD
+SAC - PD
+Grade - JD
+Multipliers - 1
+Length - Null
+Width - Null
+Stock - JD
+Notes - Null
+Diameter Over - JD
+Size - JD - List Every Size and have corresponding Lap Diameter / Lap Length
+Lap Diameter - JD
+Lap Length - JD
+Waste% - JD
+Bend - Strait
+
+SLAB
+Type-SingleLayer
+Options-2Way
+Spacing - JD
+
+CIRCULAR
+Radius - null
+
+COLUMN
+# of Verts - null
+Vert Size - JD (Matches Regular Size)
+Tie Clearance - JD
+TieSizes - JD
+
+BEAM
+TIESIZES - JD
+
+Vary
+Clearance - JD
+
+
+Get Preview Add Working
+
+
+Test 0 Case
